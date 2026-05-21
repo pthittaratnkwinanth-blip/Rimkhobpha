@@ -1,14 +1,727 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <title>ร้านข้าวราดแกงริมขอบฟ้า</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ร้านข้าวราดแกงริมขอบฟ้า v5.2 (Protected)</title>
+
+    <!-- นำเข้าฟอนต์ภาษาพม่าและไทยเพื่อให้แสดงผลสวยงามไม่เป็นสี่เหลี่ยม -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Myanmar:wght@400;700&family=Noto+Sans+Thai:wght@400;700&display=swap" rel="stylesheet">
+
     <style>
-        body, html { margin:0; padding:0; height:100%; overflow:hidden; }
-        iframe { width:100%; height:100%; border:none; }
+        /* 🔒 1. โค้ดสำหรับล็อกไม่ให้ผู้ใช้งานลากเมาส์คลุมดำไฮไลต์ข้อความบนหน้าเว็บ */
+        body {
+            font-family: 'Noto Sans Thai', 'Noto Sans Myanmar', 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-user-select: none;  /* สำหรับ Safari */
+            -moz-user-select: none;     /* สำหรับ Firefox */
+            -ms-user-select: none;      /* สำหรับ IE/Edge */
+            user-select: none;          /* สำหรับ Chrome และเบราว์เซอร์มาตรฐาน */
+        }
+
+        /* 🌐 ส่วนของปุ่มสลับภาษาด้านบน */
+        .lang-switcher {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        .btn-lang {
+            padding: 6px 12px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            background: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .btn-lang.active {
+            background-color: #333;
+            color: white;
+            border-color: #333;
+        }
+
+        /* ✅ โลโก้มุมขวาล่าง */
+        .corner-logo {
+            position: fixed;
+            bottom: 15px;
+            right: 15px;
+            width: 220px;
+            opacity: 0.95;
+            z-index: 999;
+            pointer-events: none;
+            filter: drop-shadow(0 3px 6px rgba(0,0,0,0.2));
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        h2 {
+            color: #d9534f;
+            margin-bottom: 10px;
+            margin-top: 5px;
+        }
+
+        h3 {
+            color: #333;
+            margin-top: 10px;
+            text-align: left;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: bold;
+        }
+
+        .btn-menu {
+            background-color: #f0f0f0;
+            color: #333;
+            border: 1px solid #ccc;
+        }
+
+        .btn-menu.active {
+            background-color: #d9534f;
+            color: white;
+            border-color: #d9534f;
+        }
+
+        .btn-option {
+            background-color: #e0f7fa;
+            color: #006064;
+        }
+
+        .btn-option.active {
+            background-color: #00838f;
+            color: white;
+        }
+
+        .btn-success {
+            background-color: #0288d1;
+            color: white;
+            margin-top: 15px;
+        }
+
+        .btn-success:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .result-box {
+            background: #fff8e1;
+            border: 1px solid #ffe082;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: left;
+        }
+
+        input[type="text"],
+        input[type="file"] {
+            width: 92%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+
+        input[type="file"] {
+            background: #fff;
+            cursor: pointer;
+            width: 87%;
+        }
+
+        .total {
+            font-size: 20px;
+            font-weight: bold;
+            color: #d9534f;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        .booking-list {
+            text-align: left;
+            background: #fafafa;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 8px;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .booking-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .booking-details {
+            text-align: left;
+        }
+
+        .booking-price {
+            font-weight: bold;
+            color: #d9534f;
+            white-space: nowrap;
+        }
+
+        .admin-warning {
+            color: #0288d1;
+            font-size: 13px;
+            font-weight: bold;
+            margin: -5px 0 10px 0;
+            text-align: center;
+            background-color: #e1f5fe;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        .bank-box {
+            background: #e8f5e9;
+            border: 1px solid #a5d6a7;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: left;
+            font-size: 14px;
+            color: #2e7d32;
+        }
+
+        @media (max-width: 768px) {
+            .corner-logo {
+                width: 80px;
+                bottom: 10px;
+                right: 10px;
+            }
+        }
     </style>
 </head>
+
 <body>
-    <iframe src="https://script.google.com/macros/s/AKfycbw-1PTjwscC2Yqai7noFFHL73fC9dMCFrJ1EOeKojA-hBWuSm0e0S0blQiFbuRzVmwhww/exec"></iframe>
+
+    <!-- 🌐 ปุ่มเลือกภาษาสำหรับลูกค้า/พนักงาน -->
+    <div class="lang-switcher">
+        <button class="btn-lang active" id="lang-th" onclick="switchLanguage('th')">🇹🇭 ไทย</button>
+        <button class="btn-lang" id="lang-my" onclick="switchLanguage('my')">🇲🇲 မြန်မာဘာသာ</button>
+    </div>
+
+    <img src="symbol codemantra.png" class="corner-logo" alt="CodeMantra Logo">
+
+    <div class="card">
+        <h2 data-key="shop_title">🍛 ร้านข้าวราดแกงริมขอบฟ้า</h2>
+        <p id="shop_sub" style="color: #666; margin-top: 0;" data-key="shop_subtitle">ระบบการจองข้าวราดแกง</p>
+        <hr>
+
+        <div class="bank-box">
+            💰 <b data-key="bank_info_title">ข้อมูลการโอนเงิน:</b><br>
+            <span data-key="bank_name">ธนาคารกสิกรไทย (KBank)</span><br>
+            <span data-key="bank_account_no">เลขที่บัญชี:</span> <b>321-2-64308-3</b><br>
+            <span data-key="bank_account_name">ชื่อบัญชี:</span> <b>บริษัท เมืองโบราณ จำกัด</b>
+        </div>
+
+        <div style="text-align: left; background: #f9f9f9; padding: 10px; border-radius: 8px; margin-bottom: 15px;">
+            <label>👤 <b data-key="label_cust_name">ชื่อลูกค้า หรือ รหัสการจอง:</b></label>
+            <input type="text" id="custName" placeholder="เช่น คนสวย / โต๊ะ 5 / บอส01">
+        </div>
+
+        <!-- เมนูหลักใช้ data-key สำหรับสลับข้อความภาษาพม่า -->
+        <button type="button" class="btn btn-menu" id="menu1" onclick="selectMenu(1, 30, 'menu1')">
+            ข้าวราดแกง 1 อย่าง (30 บาท)
+        </button>
+
+        <button type="button" class="btn btn-menu" id="menu2" onclick="selectMenu(2, 40, 'menu2')">
+            ข้าวราดแกง 2 อย่าง (40 บาท)
+        </button>
+
+        <button type="button" class="btn btn-menu" id="menu3" onclick="selectMenu(3, 50, 'menu3')">
+            ข้าวราดแกง 3 อย่าง (50 บาท)
+        </button>
+	<!-- =================================================== -->
+	<!-- !!! [ ซ่อนอยู่ตรงนี้ ] ข้าวคลุกกะปิ !!!                  -->
+	<!-- =================================================== -->
+	<button type="button" class="btn btn-menu" id="menu4" onclick="selectMenu(4, 40, 'menu4')" style="display: none;">
+   	 ข้าวคลุกกะปิ (40 บาท)
+	</button>
+	<!-- =================================================== -->
+	
+        <!-- ตัวเลือกเสริม -->
+        <button type="button" class="btn btn-option" id="eggOpt1" onclick="toggleEgg(1, 5, 'egg1')">
+            🥚 เพิ่มไข่ต้ม (+5 บาท)
+        </button>
+
+        <button type="button" class="btn btn-option" id="eggOpt2" onclick="toggleEgg(2, 7, 'egg2')">
+            🥚 เพิ่มไข่ดาว (+7 บาท)
+        </button>
+
+        <button type="button" class="btn btn-option" id="eggOpt3" onclick="toggleEgg(3, 15, 'egg3')">
+            🥚 เพิ่มไข่ลูกเขย (+15 บาท)
+        </button>
+
+        <button type="button" class="btn btn-option" id="eggOpt4" onclick="toggleEgg(4, 15, 'egg4')">
+            🥚 เพิ่มไข่เจียวทรงเครื่อง (+15 บาท)
+        </button>
+
+        <div style="text-align: left; background: #f9f9f9; padding: 10px; border-radius: 8px; margin-top: 15px;">
+            <label>📸 <b data-key="label_slip">แนบสลิปการโอนเงิน (ถ้ามี):</b></label>
+            <input type="file" id="slipFile" accept="image/*">
+        </div>
+
+        <div class="result-box">
+            <div>
+                <strong data-key="res_customer_label">ลูกค้า:</strong>
+                <span id="resCust" style="color:#0288d1; font-weight:bold;">หน้าร้าน (ไม่ได้จอง)</span>
+            </div>
+            <div>
+                <strong data-key="res_menu_label">รายการ:</strong>
+                <span id="resName">ยังไม่ได้เลือกเมนู</span>
+            </div>
+            <div class="total">
+                <span data-key="res_total_label">ยอดรวม:</span> <span id="resPrice">0</span> <span data-key="currency">บาท</span>
+            </div>
+        </div>
+
+        <button type="button" id="btnSave" class="btn btn-success" onclick="saveDirectToSheet()" data-key="btn_save">
+            📌 บันทึกรายการจองนี้
+        </button>
+    </div>
+
+    <div class="card">
+        <h3 style="margin: 0 0 10px 0;" data-key="list_title">📋 รายชื่อลูกค้าที่จองไว้ทั้งหมด</h3>
+        <input type="text" id="searchBox" placeholder="🔍 พิมพ์ค้นหา ชื่อ หรือ รหัสจอง..." oninput="filterBookings()">
+        <div class="admin-warning" id="adminWarn" data-key="admin_warning">🔄 รายชื่ออัปเดตอัตโนมัติจากระบบส่วนกลาง (Real-Time)</div>
+        <div class="booking-list" id="bookingListSection" data-key="loading_text">กำลังโหลดคิวจาก Google Sheets...</div>
+    </div>
+
+<script>
+    let selectedMenus = {};
+    let selectedEggs = {};
+    let totalPrice = 0;
+    let allBookings = [];
+    let currentLang = 'th'; // ตัวแปรเก็บภาษาปัจจุบัน 'th' หรือ 'my'
+
+    // คลังคำศัพท์ภาษาไทย และ ภาษาพม่า
+    const langData = {
+        th: {
+            shop_title: "🍛 ร้านข้าวราดแกงริมขอบฟ้า",
+            shop_subtitle: "ระบบการจองข้าวราดแกง",
+            bank_info_title: "ข้อมูลการโอนเงิน:",
+            bank_name: "ธนาคารกสิกรไทย (KBank)",
+            bank_account_no: "เลขที่บัญชี:",
+            bank_account_name: "ชื่อบัญชี:",
+            label_cust_name: "ชื่อลูกค้า หรือ รหัสการจอง:",
+            placeholder_cust_name: "เช่น คนสวย / โต๊ะ 5 / บอส01",
+            placeholder_search: "🔍 พิมพ์ค้นหา ชื่อ หรือ รหัสจอง...",
+            label_slip: "แนบสลิปการโอนเงิน (ถ้ามี):",
+            res_customer_label: "ลูกค้า:",
+            res_customer_default: "หน้าร้าน (ไม่ได้จอง)",
+            res_menu_label: "รายการ:",
+            res_menu_default: "ยังไม่ได้เลือกเมนู",
+            res_total_label: "ยอดรวม:",
+            currency: "บาท",
+            btn_save: "📌 บันทึกรายการจองนี้",
+            btn_saving: "⏳ กำลังส่งข้อมูล...",
+            list_title: "📋 รายชื่อลูกค้าที่จองไว้ทั้งหมด",
+            admin_warning: "🔄 รายชื่ออัปเดตอัตโนมัติจากระบบส่วนกลาง (Real-Time)",
+            loading_text: "กำลังโหลดคิวจาก Google Sheets...",
+            no_queue: "ยังไม่มีคิวจองในระบบ",
+            view_slip: "🖼️ เปิดดูสลิปโอนเงิน",
+            alert_name: "❌ กรุณาใส่ชื่อลูกค้า ก่อนกดบันทึกครับ!",
+            alert_menu: "❌ กรุณาเลือกเมนูก่อนบันทึกครับ!",
+            alert_file_err: "❌ เกิดข้อผิดพลาดในการอ่านไฟล์",
+            alert_success: "📌 บันทึกข้อมูลเรียบร้อยแล้ว!",
+            alert_error: "❌ เกิดข้อผิดพลาด",
+            alert_context: "🔒 ไม่อนุญาตให้คลิกขวาบนหน้าเว็บนี้เพื่อความปลอดภัยของระบบครับ",
+            // ชื่อเมนูที่จะส่งลงสลีป/ชีตและแสดงผล
+            menu1: "ข้าวราดแกง 1 อย่าง",
+            menu2: "ข้าวราดแกง 2 อย่าง",
+            menu3: "ข้าวราดแกง 3 อย่าง",
+            menu4: "ข้าวคลุกกะปิ",
+            egg1: "เพิ่มไข่ต้ม",
+            egg2: "เพิ่มไข่ดาว",
+            egg3: "เพิ่มไข่ลูกเขย",
+            egg4: "เพิ่มไข่เจียวทรงเครื่อง"
+        },
+        my: {
+            shop_title: "🍛 မိုးကုတ်စက်ဝိုင်း ထမင်းဆိုင်",
+            shop_subtitle: "ထมင်းနှင့်ဟင်း မှာယူမှုစနစ်",
+            bank_info_title: "ငွေလွှဲရန် အချက်အလက်များ:",
+            bank_name: "ကစီကွန်ဘဏ် (KBank)",
+            bank_account_no: "အကောင့်နံပါတ်:",
+            bank_account_name: "အကောင့်အမည်:",
+            label_cust_name: "ဝယ်သူအမည် သို့မဟုတ် မှာယူမှုကုဒ်:",
+            placeholder_cust_name: "ဥပမာ- အလှလေး / စားပွဲ ၅ / Boss01",
+            placeholder_search: "🔍 အမည် သို့မဟုတ် ကုဒ်ဖြင့် ရှာဖွေရန်...",
+            label_slip: "ငွေလွှဲပြေစာ ပူးတွဲပါ (ရှိလျှင်):",
+            res_customer_label: "ဝယ်သူ:",
+            res_customer_default: "ဆိုင်တွင် တိုက်ရိုက် (မမှာယူထားပါ)",
+            res_menu_label: "မီနူးစာရင်း:",
+            res_menu_default: "မီနူးမရွေးရသေးပါ",
+            res_total_label: "စုစုပေါင်း:",
+            currency: "ဘတ်",
+            btn_save: "📌 ဤမှာယူမှုကို သိမ်းဆည်းမည်",
+            btn_saving: "⏳ အချက်အလက်များ ပို့နေသည်...",
+            list_title: "📋 မှာယူထားသော ဝယ်သူများစာရင်း",
+            admin_warning: "🔄 ဗဟိုစနစ်မှ အချက်အလက်များကို အလိုအလျောက် အပ်ဒိတ်လုပ်နေသည် (Real-Time)",
+            loading_text: "Google Sheets မှ အချက်အလက်များကို ဆွဲယူနေသည်...",
+            no_queue: "စနစ်ထဲတွင် မှာယူမှုမရှိသေးပါ",
+            view_slip: "🖼️ ငွေလွှဲပြေစာကြည့်ရန်",
+            alert_name: "❌ မသိမ်းဆည်းမီ ဝယ်သူအမည်ကို ထည့်သွင်းပေးပါရန်!",
+            alert_menu: "❌ မသိမ်းဆည်းမီ မီနူးကို အရင်ရွေးချယ်ပေးပါရန်!",
+            alert_file_err: "❌ ဖိုင်ဖတ်ရာတွင် အမှားအယွင်းရှိနေပါသည်",
+            alert_success: "📌 အချက်အလက်များကို အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ!",
+            alert_error: "❌ အမှားအယွင်းရှိပါသည်",
+            alert_context: "🔒 စနစ်လုံခြုံရေးအရ ဤဝဘ်ဆိုဒ်ပေါ်တွင် Right-Click နှိပ်ခွင့်မပြုပါ",
+            menu1: "ထမင်းနှင့်ဟင်း ၁ မျိုး",
+            menu2: "ထမင်းและဟင်း ၂ မျိုး",
+            menu3: "ထမင်းနှင့်ဟင်း ၃ မျိုး",
+            menu4: "ငါးပိထမင်းနယ်",
+            egg1: "ကြက်ဥပြုတ် ထပ်တိုး",
+            egg2: "ကြက်ဥကြော် ထပ်တိုး",
+            egg3: "ခဲယိုကြက်ဥ ထပ်တိုး",
+            egg4: "ကြက်ဥမုန့်ကြော် ထပ်တိုး"
+        }
+    };
+
+    const fetchUrl = "https://docs.google.com/spreadsheets/d/1sZB3Mx32-Vmx81EZQlnWQ4XByVhWnOdyaZPHQxjhQzU/gviz/tq?sheet=inventory";
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbzco0ByOGoNy11halborRSSQd3ej3On_OIQuztzebuyteXZfMd7PQhyC1Vfo3mtLmrldw/exec";
+
+    fetchSheetData();
+    setInterval(fetchSheetData, 5000);
+
+    // ฟังก์ชันสำหรับสลับภาษาหน้าเว็บ
+    function switchLanguage(lang) {
+        currentLang = lang;
+        document.documentElement.lang = lang;
+        
+        // สลับสถานะปุ่มเลือกภาษา
+        document.getElementById('lang-th').classList.toggle('active', lang === 'th');
+        document.getElementById('lang-my').classList.toggle('active', lang === 'my');
+
+        // เปลี่ยนข้อความในแอตทริบิวต์ data-key ทั้งหมด
+        document.querySelectorAll('[data-key]').forEach(el => {
+            const key = el.getAttribute('data-key');
+            if (langData[lang][key]) {
+                el.innerText = langData[lang][key];
+            }
+        });
+
+        // เปลี่ยน Placeholder ของช่องกรอกข้อมูล
+        document.getElementById('custName').placeholder = langData[lang].placeholder_cust_name;
+        document.getElementById('searchBox').placeholder = langData[lang].placeholder_search;
+
+        // อัปเดตข้อความบนปุ่มเมนูอาหารและปุ่มไข่ต่างๆ 
+        document.getElementById('menu1').innerHTML = `${langData[lang].menu1} (30 ${langData[lang].currency})`;
+        document.getElementById('menu2').innerHTML = `${langData[lang].menu2} (40 ${langData[lang].currency})`;
+        document.getElementById('menu3').innerHTML = `${langData[lang].menu3} (50 ${langData[lang].currency})`;
+        document.getElementById('menu4').innerHTML = `${langData[lang].menu4} (40 ${langData[lang].currency})`;
+
+        document.getElementById('eggOpt1').innerHTML = `🥚 ${langData[lang].egg1} (+5 ${langData[lang].currency})`;
+        document.getElementById('eggOpt2').innerHTML = `🥚 ${langData[lang].egg2} (+7 ${langData[lang].currency})`;
+        document.getElementById('eggOpt3').innerHTML = `🥚 ${langData[lang].egg3} (+15 ${langData[lang].currency})`;
+        document.getElementById('eggOpt4').innerHTML = `🥚 ${langData[lang].egg4} (+15 ${langData[lang].currency})`;
+
+        updateTotal();
+        renderBookings(allBookings);
+    }
+
+    function selectMenu(id, price, langKey) {
+        const btn = document.getElementById('menu' + id);
+        if (selectedMenus[id]) {
+            delete selectedMenus[id];
+            btn.classList.remove('active');
+        } else {
+            selectedMenus[id] = { langKey: langKey, price: price };
+            btn.classList.add('active');
+        }
+        updateTotal();
+    }
+
+    function toggleEgg(id, price, langKey) {
+        const btn = document.getElementById('eggOpt' + id);
+        if (selectedEggs[id]) {
+            delete selectedEggs[id];
+            btn.classList.remove('active');
+        } else {
+            selectedEggs[id] = { langKey: langKey, price: price };
+            btn.classList.add('active');
+        }
+        updateTotal();
+    }
+
+    function updateTotal() {
+        let menuNamesArray = [];
+        let menuSum = 0;
+
+        for (let id in selectedMenus) {
+            // ดึงชื่อภาษาไทยหรือพม่าจากคลังคำศัพท์ตามภาษาที่เลือกขณะนั้น
+            menuNamesArray.push(langData[currentLang][selectedMenus[id].langKey]);
+            menuSum += selectedMenus[id].price;
+        }
+
+        for (let id in selectedEggs) {
+            menuNamesArray.push(langData[currentLang][selectedEggs[id].langKey]);
+            menuSum += selectedEggs[id].price;
+        }
+
+        totalPrice = menuSum;
+        let finalName = menuNamesArray.length > 0 ? menuNamesArray.join(" + ") : langData[currentLang].res_menu_default;
+        let cName = document.getElementById('custName').value.trim() || langData[currentLang].res_customer_default;
+
+        document.getElementById('resCust').innerText = cName;
+        document.getElementById('resName').innerText = finalName;
+        document.getElementById('resPrice').innerText = totalPrice;
+    }
+
+    document.getElementById('custName').addEventListener('input', function () {
+        let name = this.value.trim() || langData[currentLang].res_customer_default;
+        document.getElementById('resCust').innerText = name;
+    });
+
+    function getBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    async function saveDirectToSheet() {
+        let name = document.getElementById('custName').value.trim();
+        let menuNamesArray = [];
+
+        // ส่งข้อมูลเข้าชีตยึดตามภาษาที่เปิด ณ ตอนนั้น
+        for (let id in selectedMenus) {
+            menuNamesArray.push(langData[currentLang][selectedMenus[id].langKey]);
+        }
+        for (let id in selectedEggs) {
+            menuNamesArray.push(langData[currentLang][selectedEggs[id].langKey]);
+        }
+        let finalMenu = menuNamesArray.join(" + ");
+
+        if (!name) {
+            alert(langData[currentLang].alert_name);
+            return;
+        }
+        if (totalPrice === 0) {
+            alert(langData[currentLang].alert_menu);
+            return;
+        }
+
+        let btn = document.getElementById('btnSave');
+        btn.disabled = true;
+        btn.innerText = langData[currentLang].btn_saving;
+
+        let formData = new FormData();
+        formData.append("custName", name);
+        formData.append("submit_menu", finalMenu);
+        formData.append("submit_price", totalPrice);
+
+        let fileInput = document.getElementById('slipFile');
+        if (fileInput.files.length > 0) {
+            let file = fileInput.files[0];
+            try {
+                let base64Data = await getBase64(file);
+                formData.append("slipData", base64Data);
+                formData.append("slipName", file.name);
+                formData.append("slipType", file.type);
+            } catch (err) {
+                alert(langData[currentLang].alert_file_err);
+                btn.disabled = false;
+                btn.innerText = langData[currentLang].btn_save;
+                return;
+            }
+        }
+
+        fetch(scriptUrl, {
+            method: 'POST',
+            body: formData,
+            mode: 'no-cors'
+        })
+        .then(() => {
+            alert(langData[currentLang].alert_success);
+            clearForm();
+            setTimeout(fetchSheetData, 1500);
+        })
+        .catch(error => {
+            console.error(error);
+            alert(langData[currentLang].alert_error);
+        })
+        .finally(() => {
+            btn.disabled = false;
+            btn.innerText = langData[currentLang].btn_save;
+        });
+    }
+
+    function fetchSheetData() {
+        fetch(fetchUrl + "&t=" + new Date().getTime())
+        .then(response => {
+            if (!response.ok) throw new Error("Network error");
+            return response.text();
+        })
+        .then(data => {
+            allBookings = parseCSV(data);
+            renderBookings(allBookings);
+        })
+        .catch(error => {
+            console.error(error);
+        });
+    }
+
+    function parseCSV(text) {
+        let result = [];
+        try {
+            let rawData = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);/);
+            if (!rawData) return result;
+            let jsonData = JSON.parse(rawData[1]);
+            let rows = jsonData.table.rows;
+
+            for (let i = 0; i < rows.length; i++) {
+                let row = rows[i].c;
+                if (!row || !row[0]) continue;
+
+                let nameVal = row[0] ? row[0].v : "";
+                let menuVal = row[1] ? row[1].v : "";
+                let priceVal = row[2] ? row[2].v : "";
+                let imgVal = row[3] ? row[3].v : "";
+
+                if (nameVal && nameVal !== "ชื่อพนักงาน" && nameVal !== "ชื่อลูกค้า") {
+                    result.push({
+                        name: nameVal,
+                        menu: menuVal,
+                        price: priceVal,
+                        imgUrl: imgVal
+                    });
+                }
+            }
+        } catch (e) {
+            console.error(e);
+        }
+        return result.reverse();
+    }
+
+    function renderBookings(bookingsList) {
+        let listSection = document.getElementById('bookingListSection');
+        listSection.innerHTML = "";
+
+        if (bookingsList.length === 0) {
+            listSection.innerHTML = `<p style='color:#999; text-align:center;'>${langData[currentLang].no_queue}</p>`;
+            return;
+        }
+
+        bookingsList.forEach(b => {
+            let item = document.createElement('div');
+            item.className = "booking-item";
+            let downloadBtn = "";
+
+            if (b.imgUrl && b.imgUrl.toString().startsWith("http")) {
+                downloadBtn = `<br><a href="${b.imgUrl}" target="_blank" style="display:inline-block; margin-top:6px; padding:4px 10px; background-color:#0288d1; color:white; border-radius:5px; text-decoration:none; font-size:12px; font-weight:bold;">${langData[currentLang].view_slip}</a>`;
+            }
+
+            item.innerHTML = `
+                <div class="booking-details">
+                    <b>👤 ${b.name}</b>
+                    ${downloadBtn}
+                    <br>
+                    <small style="color:#666;">${b.menu}</small>
+                </div>
+                <div class="booking-price">
+                    ${b.price ? b.price + ' ' + langData[currentLang].currency : ''}
+                </div>
+            `;
+            listSection.appendChild(item);
+        });
+    }
+
+    function filterBookings() {
+        let searchKeyword = document.getElementById('searchBox').value.toLowerCase().trim();
+        if (searchKeyword === "") {
+            renderBookings(allBookings);
+            return;
+        }
+        let filtered = allBookings.filter(b => b.name.toLowerCase().includes(searchKeyword));
+        renderBookings(filtered);
+    }
+
+    function clearForm() {
+        document.getElementById('custName').value = "";
+        document.getElementById('slipFile').value = "";
+
+        selectedMenus = {};
+        selectedEggs = {};
+        totalPrice = 0;
+
+        for (let i = 1; i <= 4; i++) {
+            let menuBtn = document.getElementById('menu' + i);
+            let eggBtn = document.getElementById('eggOpt' + i);
+            if (menuBtn) menuBtn.classList.remove('active');
+            if (eggBtn) eggBtn.classList.remove('active');
+        }
+        updateTotal();
+    }
+
+    /* =======================================================
+        🔒 2. โค้ด JavaScript สำหรับบล็อกการคลิกขวาและบล็อกคีย์ลัด 
+       ======================================================= */
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        alert(langData[currentLang].alert_context);
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === "F12" || e.keyCode === 123) {
+            e.preventDefault();
+            return false;
+        }
+        if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C' || e.key === 'i' || e.key === 'j' || e.key === 'c')) {
+            e.preventDefault();
+            return false;
+        }
+        if (e.ctrlKey && (e.key === 'u' || e.key === 'U')) {
+            e.preventDefault();
+            return false;
+        }
+        if (e.ctrlKey && (e.key === 's' || e.key === 'S')) {
+            e.preventDefault();
+            return false;
+        }
+        if (e.ctrlKey && (e.key === 'c' || e.key === 'C')) {
+            e.preventDefault();
+            return false;
+        }
+    });
+</script>
+
 </body>
 </html>
