@@ -327,3 +327,49 @@
     let currentLang = 'th'; // ตัวแปรเก็บภาษาปัจจุบัน 'th' หรือ 'my'
 
     // ค่ะ
+async function saveDirectToSheet() {
+        const btn = document.getElementById("btnSave");
+        btn.disabled = true;
+        btn.innerText = "กำลังบันทึก...";
+
+        const formData = new FormData();
+        formData.append("custName", document.getElementById("custName").value);
+        formData.append("submit_menu", document.getElementById("resName").innerText);
+        formData.append("submit_price", document.getElementById("resPrice").innerText);
+
+        // จัดการไฟล์สลิป
+        const fileInput = document.getElementById("slipFile");
+        if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64 = e.target.result.split(',')[1];
+                formData.append("slipData", base64);
+                formData.append("slipName", file.name);
+                formData.append("slipType", file.type);
+                sendData(formData, btn);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            sendData(formData, btn);
+        }
+    }
+
+    async function sendData(formData, btn) {
+        // ⚠️ นี่คือจุดที่พี่ต้องเอา URL ของ Web App พี่มาวางครับ!
+        const url = "https://script.google.com/macros/s/AKfycbyn87SgCdCVMYpLTJUun0qTyMvJxmMN3NAAV1DlexCfzJvJpXSXZyiz1o34koC9YbCwzQ/exec";
+        
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                body: formData
+            });
+            const result = await response.text();
+            alert("บันทึกรายการเรียบร้อย!");
+            location.reload();
+        } catch (e) {
+            alert("เกิดข้อผิดพลาด: " + e);
+            btn.disabled = false;
+            btn.innerText = "📌 บันทึกรายการจองนี้";
+        }
+    }
