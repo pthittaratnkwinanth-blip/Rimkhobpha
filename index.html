@@ -231,10 +231,11 @@
 <body>
 
     <!-- 🌐 ปุ่มเลือกภาษาสำหรับลูกค้า/พนักงาน -->
-    <div class="lang-switcher">
-        <button class="btn-lang active" id="lang-th" onclick="switchLanguage('th')">🇹🇭 ไทย</button>
-        <button class="btn-lang" id="lang-my" onclick="switchLanguage('my')">🇲🇲 မြန်မာဘာသာ</button>
-    </div>
+   <div class="lang-switcher">
+    <button class="btn-lang active" id="lang-th" onclick="switchLanguage('th')">🇹🇭 ไทย</button>
+    <button class="btn-lang" id="lang-my" onclick="switchLanguage('my')">🇲🇲 မြန်မာဘာသာ</button>
+    <button class="btn-lang" id="lang-en" onclick="switchLanguage('en')">EN English</button>
+</div>
 
     <img src="symbol codemantra.png" class="corner-logo" alt="CodeMantra Logo">
 
@@ -410,11 +411,49 @@
             egg2: "ကြက်ဥကြော် ထပ်တိုး",
             egg3: "ခဲယိုကြက်ဥ ထပ်တိုး",
             egg4: "ကြက်ဥမုန့်ကြော် ထပ်တိုး"
+        },
+	en: {
+            shop_title: "🍛 Rimkhobpha Curry Rice",
+            shop_subtitle: "Curry Rice Booking System",
+            bank_info_title: "Payment Information:",
+            bank_name: "Kasikorn Bank (KBank)",
+            bank_account_no: "Account Number:",
+            bank_account_name: "Account Name:",
+            label_cust_name: "Customer Name or Booking ID:",
+            placeholder_cust_name: "e.g., John / Table 5 / Boss01",
+            placeholder_search: "🔍 Search by name or ID...",
+            label_slip: "Attach Payment Slip (if any):",
+            res_customer_label: "Customer:",
+            res_customer_default: "Walk-in (No booking)",
+            res_menu_label: "Items:",
+            res_menu_default: "No menu selected",
+            res_total_label: "Total:",
+            currency: "THB",
+            btn_save: "📌 Save Booking",
+            btn_saving: "⏳ Sending...",
+            list_title: "📋 Booking List",
+            admin_warning: "🔄 Real-time update from central system",
+            loading_text: "Loading queue from Google Sheets...",
+            no_queue: "No bookings yet",
+            view_slip: "🖼️ View Slip",
+            alert_name: "❌ Please enter your name!",
+            alert_menu: "❌ Please select a menu!",
+            alert_file_err: "❌ File error",
+            alert_success: "📌 Saved successfully!",
+            alert_error: "❌ Error occurred",
+            alert_context: "🔒 Right-click is disabled for security.",
+            menu1: "Rice + 1 Curry",
+            menu2: "Rice + 2 Curries",
+            menu3: "Rice + 3 Curries",
+            menu4: "Shrimp Paste Fried Rice",
+            egg1: "Add Boiled Egg",
+            egg2: "Add Fried Egg",
+            egg3: "Add Scotch Egg",
+            egg4: "Add Omelet"
         }
-    };
-
+    }; // <--- ปิดก้อน langData ตรงนี้
     const fetchUrl = "https://docs.google.com/spreadsheets/d/1sZB3Mx32-Vmx81EZQlnWQ4XByVhWnOdyaZPHQxjhQzU/gviz/tq?sheet=inventory";
-    const scriptUrl = "https://script.google.com/macros/s/AKfycbyB_p-HiZghk5Mmdrad0RoGv3wCPqru0LVtTWBSm1eNdF7Wc0KBnYUXi2srkDZPnHcQjg/exec";
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbzco0ByOGoNy11halborRSSQd3ej3On_OIQuztzebuyteXZfMd7PQhyC1Vfo3mtLmrldw/exec";
 
     fetchSheetData();
     setInterval(fetchSheetData, 5000);
@@ -425,8 +464,9 @@
         document.documentElement.lang = lang;
         
         // สลับสถานะปุ่มเลือกภาษา
-        document.getElementById('lang-th').classList.toggle('active', lang === 'th');
-        document.getElementById('lang-my').classList.toggle('active', lang === 'my');
+    document.getElementById('lang-th').classList.toggle('active', lang === 'th');
+    document.getElementById('lang-my').classList.toggle('active', lang === 'my');
+    document.getElementById('lang-en').classList.toggle('active', lang === 'en'); // <--- เพิ่มบรรทัดนี้ลงไป
 
         // เปลี่ยนข้อความในแอตทริบิวต์ data-key ทั้งหมด
         document.querySelectorAll('[data-key]').forEach(el => {
