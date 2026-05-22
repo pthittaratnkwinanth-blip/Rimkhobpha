@@ -331,7 +331,7 @@
     let allBookings = [];
     let currentLang = 'th'; // ตัวแปรเก็บภาษาปัจจุบัน 'th' หรือ 'my'
 
-    // คลังคำศัพท์ภาษาไทย และ ภาษาพม่า
+    // คลังคำศัพท์ภาษาไทย และ ภาษาพม่า และอังกฤษ
     const langData = {
         th: {
             shop_title: "🍛 ร้านข้าวราดแกงริมขอบฟ้า",
@@ -452,8 +452,9 @@
             egg4: "Add Omelet"
         }
     }; // <--- ปิดก้อน langData ตรงนี้
+
     const fetchUrl = "https://docs.google.com/spreadsheets/d/1sZB3Mx32-Vmx81EZQlnWQ4XByVhWnOdyaZPHQxjhQzU/gviz/tq?sheet=inventory";
-    const scriptUrl = "https://script.google.com/macros/s/AKfycbzco0ByOGoNy11halborRSSQd3ej3On_OIQuztzebuyteXZfMd7PQhyC1Vfo3mtLmrldw/exec";
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbyB_p-HiZghk5Mmdrad0RoGv3wCPqru0LVtTWBSm1eNdF7Wc0KBnYUXi2srkDZPnHcQjg/exec";
 
     fetchSheetData();
     setInterval(fetchSheetData, 5000);
@@ -464,9 +465,8 @@
         document.documentElement.lang = lang;
         
         // สลับสถานะปุ่มเลือกภาษา
-    document.getElementById('lang-th').classList.toggle('active', lang === 'th');
-    document.getElementById('lang-my').classList.toggle('active', lang === 'my');
-    document.getElementById('lang-en').classList.toggle('active', lang === 'en'); // <--- เพิ่มบรรทัดนี้ลงไป
+        document.getElementById('lang-th').classList.toggle('active', lang === 'th');
+        document.getElementById('lang-my').classList.toggle('active', lang === 'my');
 
         // เปลี่ยนข้อความในแอตทริบิวต์ data-key ทั้งหมด
         document.querySelectorAll('[data-key]').forEach(el => {
