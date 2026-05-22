@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ร้านข้าวราดแกงริมขอบฟ้า v5.2 (Protected)</title>
 
-    <!-- นำเข้าฟอนต์ภาษาพม่าและไทยเพื่อให้แสดงผลสวยงามไม่เป็นสี่เหลี่ยม -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Myanmar:wght@400;700&family=Noto+Sans+Thai:wght@400;700&display=swap" rel="stylesheet">
@@ -230,13 +229,16 @@
 
 <body>
 
-    <!-- 🌐 ปุ่มเลือกภาษาสำหรับลูกค้า/พนักงาน -->
-   <div class="lang-switcher">
-    <button class="btn-lang active" id="lang-th" onclick="switchLanguage('th')">🇹🇭 ไทย</button>
-    <button class="btn-lang" id="lang-my" onclick="switchLanguage('my')">🇲🇲 မြန်မာဘာသာ</button>
-    <button class="btn-lang" id="lang-en" onclick="switchLanguage('en')">EN English</button>
-</div>
-
+    <div class="lang-switcher">
+        <button class="btn-lang active" id="lang-th" onclick="switchLanguage('th')">🇹🇭 ไทย</button>
+        <button class="btn-lang" id="lang-my" onclick="switchLanguage('my')">🇲🇲 မြန်မာဘာသာ</button>
+        <button class="btn-lang" id="lang-en" onclick="switchLanguage('en')">EN English</button>
+    </div>
+    
+    <div id="announcement-bar" style="background: #ffeb3b; padding: 10px; border-radius: 8px; margin: 10px 0; display: none; font-weight: bold; color: #d32f2f; text-align: center; width: 90%; max-width: 400px;">
+        📢 <span id="announcement-text"></span>
+    </div>
+    
     <img src="symbol codemantra.png" class="corner-logo" alt="CodeMantra Logo">
 
     <div class="card">
@@ -256,7 +258,6 @@
             <input type="text" id="custName" placeholder="เช่น คนสวย / โต๊ะ 5 / บอส01">
         </div>
 
-        <!-- เมนูหลักใช้ data-key สำหรับสลับข้อความภาษาพม่า -->
         <button type="button" class="btn btn-menu" id="menu1" onclick="selectMenu(1, 30, 'menu1')">
             ข้าวราดแกง 1 อย่าง (30 บาท)
         </button>
@@ -268,15 +269,11 @@
         <button type="button" class="btn btn-menu" id="menu3" onclick="selectMenu(3, 50, 'menu3')">
             ข้าวราดแกง 3 อย่าง (50 บาท)
         </button>
-	<!-- =================================================== -->
-	<!-- !!! [ ซ่อนอยู่ตรงนี้ ] ข้าวคลุกกะปิ !!!                  -->
-	<!-- =================================================== -->
-	<button type="button" class="btn btn-menu" id="menu4" onclick="selectMenu(4, 40, 'menu4')" style="display: none;">
-   	 ข้าวคลุกกะปิ (40 บาท)
-	</button>
-	<!-- =================================================== -->
-	
-        <!-- ตัวเลือกเสริม -->
+        
+        <button type="button" class="btn btn-menu" id="menu4" onclick="selectMenu(4, 40, 'menu4')" style="display: none;">
+            ข้าวคลุกกะปิ (40 บาท)
+        </button>
+        
         <button type="button" class="btn btn-option" id="eggOpt1" onclick="toggleEgg(1, 5, 'egg1')">
             🥚 เพิ่มไข่ต้ม (+5 บาท)
         </button>
@@ -329,7 +326,7 @@
     let selectedEggs = {};
     let totalPrice = 0;
     let allBookings = [];
-    let currentLang = 'th'; // ตัวแปรเก็บภาษาปัจจุบัน 'th' หรือ 'my'
+    let currentLang = 'th'; 
 
     // คลังคำศัพท์ภาษาไทย และ ภาษาพม่า และอังกฤษ
     const langData = {
@@ -363,7 +360,6 @@
             alert_success: "📌 บันทึกข้อมูลเรียบร้อยแล้ว!",
             alert_error: "❌ เกิดข้อผิดพลาด",
             alert_context: "🔒 ไม่อนุญาตให้คลิกขวาบนหน้าเว็บนี้เพื่อความปลอดภัยของระบบครับ",
-            // ชื่อเมนูที่จะส่งลงสลีป/ชีตและแสดงผล
             menu1: "ข้าวราดแกง 1 อย่าง",
             menu2: "ข้าวราดแกง 2 อย่าง",
             menu3: "ข้าวราดแกง 3 อย่าง",
@@ -375,7 +371,7 @@
         },
         my: {
             shop_title: "🍛 မိုးကုတ်စက်ဝိုင်း ထမင်းဆိုင်",
-            shop_subtitle: "ထมင်းနှင့်ဟင်း မှာယူမှုစနစ်",
+            shop_subtitle: "ထမင်းနှင့်ဟင်း မှာယူမှုစနစ်",
             bank_info_title: "ငွေလွှဲရန် အချက်အလက်များ:",
             bank_name: "ကစီကွန်ဘဏ် (KBank)",
             bank_account_no: "အကောင့်နံပါတ်:",
@@ -412,7 +408,7 @@
             egg3: "ခဲယိုကြက်ဥ ထပ်တိုး",
             egg4: "ကြက်ဥမုန့်ကြော် ထပ်တိုး"
         },
-	en: {
+        en: {
             shop_title: "🍛 Rimkhobpha Curry Rice",
             shop_subtitle: "Curry Rice Booking System",
             bank_info_title: "Payment Information:",
@@ -451,7 +447,7 @@
             egg3: "Add Scotch Egg",
             egg4: "Add Omelet"
         }
-    }; // <--- ปิดก้อน langData ตรงนี้
+    };
 
     const fetchUrl = "https://docs.google.com/spreadsheets/d/1sZB3Mx32-Vmx81EZQlnWQ4XByVhWnOdyaZPHQxjhQzU/gviz/tq?sheet=inventory";
     const scriptUrl = "https://script.google.com/macros/s/AKfycbyB_p-HiZghk5Mmdrad0RoGv3wCPqru0LVtTWBSm1eNdF7Wc0KBnYUXi2srkDZPnHcQjg/exec";
@@ -467,6 +463,7 @@
         // สลับสถานะปุ่มเลือกภาษา
         document.getElementById('lang-th').classList.toggle('active', lang === 'th');
         document.getElementById('lang-my').classList.toggle('active', lang === 'my');
+        document.getElementById('lang-en').classList.toggle('active', lang === 'en');
 
         // เปลี่ยนข้อความในแอตทริบิวต์ data-key ทั้งหมด
         document.querySelectorAll('[data-key]').forEach(el => {
@@ -524,7 +521,6 @@
         let menuSum = 0;
 
         for (let id in selectedMenus) {
-            // ดึงชื่อภาษาไทยหรือพม่าจากคลังคำศัพท์ตามภาษาที่เลือกขณะนั้น
             menuNamesArray.push(langData[currentLang][selectedMenus[id].langKey]);
             menuSum += selectedMenus[id].price;
         }
@@ -561,7 +557,6 @@
         let name = document.getElementById('custName').value.trim();
         let menuNamesArray = [];
 
-        // ส่งข้อมูลเข้าชีตยึดตามภาษาที่เปิด ณ ตอนนั้น
         for (let id in selectedMenus) {
             menuNamesArray.push(langData[currentLang][selectedMenus[id].langKey]);
         }
@@ -761,7 +756,49 @@
             return false;
         }
     });
-</script>
 
+    /* =======================================================
+        📢 3. โค้ดสำหรับดึงข้อมูลการแจ้งเตือนจากชีท Announce (config)
+       ======================================================= */
+    async function fetchAnnouncement() {
+        const fileId = "1US69UZxdU7NTyP2y0nYmebshzbUIYfiO6V7NlJRI4EI"; 
+        const configUrl = `https://docs.google.com/spreadsheets/d/${fileId}/gviz/tq?sheet=config`;
+        
+        try {
+            let response = await fetch(configUrl + "&t=" + new Date().getTime());
+            let text = await response.text();
+            let rawData = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);/);
+            if (!rawData) return;
+            
+            let jsonData = JSON.parse(rawData[1]);
+            if (!jsonData.table || !jsonData.table.rows) return;
+            
+            jsonData.table.rows.forEach(row => {
+                if (!row.c) return;
+                let key = row.c[0] ? row.c[0].v : "";
+                let val = row.c[1] ? row.c[1].v : "";
+                
+                if (key === "announcement") {
+                    let bar = document.getElementById('announcement-bar');
+                    let textEl = document.getElementById('announcement-text');
+                    
+                    if (val && val.toString().trim() !== "") {
+                        textEl.innerText = val;
+                        bar.style.display = "block";
+                    } else {
+                        bar.style.display = "none";
+                    }
+                }
+            });
+        } catch (e) {
+            console.error("ดึงข้อมูลจากไฟล์ Announce ไม่ได้:", e);
+        }
+    }
+
+    // สั่งรันดึงประกาศทันที และดึงซ้ำทุกๆ 10 วินาที
+    setInterval(fetchAnnouncement, 10000);
+    fetchAnnouncement();
+
+</script>
 </body>
 </html>
