@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ร้านข้าวราดแกงริมขอบฟ้า v5.2 (Protected)</title>
+    <title>ร้านข้าวราดแกงริมขอบฟ้า v5.3 (Cashier Update Enabled)</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -258,37 +258,20 @@
             <input type="text" id="custName" placeholder="เช่น คนสวย / โต๊ะ 5 / บอส01">
         </div>
 
-        <button type="button" class="btn btn-menu" id="menu1" onclick="selectMenu(1, 30, 'menu1')">
-            ข้าวราดแกง 1 อย่าง (30 บาท)
-        </button>
-
-        <button type="button" class="btn btn-menu" id="menu2" onclick="selectMenu(2, 40, 'menu2')">
-            ข้าวราดแกง 2 อย่าง (40 บาท)
-        </button>
-
-        <button type="button" class="btn btn-menu" id="menu3" onclick="selectMenu(3, 50, 'menu3')">
-            ข้าวราดแกง 3 อย่าง (50 บาท)
-        </button>
+        <button type="button" class="btn btn-menu" id="menu1" onclick="selectMenu(1, 30, 'menu1')">ราดข้าว 1 อย่าง (30 บาท)</button>
+        <button type="button" class="btn btn-menu" id="menu2" onclick="selectMenu(2, 40, 'menu2')">ราดข้าว 2 อย่าง (40 บาท)</button>
+        <button type="button" class="btn btn-menu" id="menu3" onclick="selectMenu(3, 50, 'menu3')">ราดข้าว 3 อย่าง (50 บาท)</button>
+        <button type="button" class="btn btn-menu" id="menu4" onclick="selectMenu(4, 40, 'menu4')">กับข้าว (40 บาท)</button>
+        <button type="button" class="btn btn-menu" id="menu5" onclick="selectMenu(5, 30, 'menu5')">กับข้าว (30 บาท)</button>
+        <button type="button" class="btn btn-menu" id="menu6" onclick="selectMenu(6, 30, 'menu6')">อาหารจานเดียว (30 บาท)</button>
+        <button type="button" class="btn btn-menu" id="menu7" onclick="selectMenu(7, 40, 'menu7')">อาหารจานเดียว (40 บาท)</button>
+        <button type="button" class="btn btn-menu" id="menu8" onclick="selectMenu(8, 10, 'menu8')">ข้าวเปล่า (10 บาท)</button>
         
-        <button type="button" class="btn btn-menu" id="menu4" onclick="selectMenu(4, 40, 'menu4')" style="display: none;">
-            ข้าวคลุกกะปิ (40 บาท)
-        </button>
-        
-        <button type="button" class="btn btn-option" id="eggOpt1" onclick="toggleEgg(1, 5, 'egg1')">
-            🥚 เพิ่มไข่ต้ม (+5 บาท)
-        </button>
-
-        <button type="button" class="btn btn-option" id="eggOpt2" onclick="toggleEgg(2, 7, 'egg2')">
-            🥚 เพิ่มไข่ดาว (+7 บาท)
-        </button>
-
-        <button type="button" class="btn btn-option" id="eggOpt3" onclick="toggleEgg(3, 15, 'egg3')">
-            🥚 เพิ่มไข่ลูกเขย (+15 บาท)
-        </button>
-
-        <button type="button" class="btn btn-option" id="eggOpt4" onclick="toggleEgg(4, 15, 'egg4')">
-            🥚 เพิ่มไข่เจียวทรงเครื่อง (+15 บาท)
-        </button>
+        <button type="button" class="btn btn-option" id="eggOpt1" onclick="toggleEgg(1, 5, 'egg1')">🥚 เพิ่มไข่ต้ม (+5 บาท)</button>
+        <button type="button" class="btn btn-option" id="eggOpt2" onclick="toggleEgg(2, 7, 'egg2')">🥚 เพิ่มไข่ดาว (+7 บาท)</button>
+        <button type="button" class="btn btn-option" id="eggOpt3" onclick="toggleEgg(3, 15, 'egg3')">🥚 เพิ่มไข่เจียวทรงเครื่อง (+15 บาท)</button>
+        <button type="button" class="btn btn-option" id="eggOpt4" onclick="toggleEgg(4, 15, 'egg4')">🥚 เพิ่มไข่ลูกเขย (+15 บาท)</button>
+        <button type="button" class="btn btn-option" id="eggOpt5" onclick="toggleEgg(5, 20, 'egg5')">🥚 เพิ่มพะโล้ (+20 บาท)</button>
 
         <div style="text-align: left; background: #f9f9f9; padding: 10px; border-radius: 8px; margin-top: 15px;">
             <label>📸 <b data-key="label_slip">แนบสลิปการโอนเงิน (ถ้ามี):</b></label>
@@ -328,7 +311,7 @@
     let allBookings = [];
     let currentLang = 'th'; 
 
-    // คลังคำศัพท์ภาษาไทย และ ภาษาพม่า และอังกฤษ
+    // คลังคำศัพท์ภาษาไทย ภาษาพม่า และอังกฤษ (เพิ่มข้อความสำหรับแคชเชียร์)
     const langData = {
         th: {
             shop_title: "🍛 ร้านข้าวราดแกงริมขอบฟ้า",
@@ -354,25 +337,31 @@
             loading_text: "กำลังโหลดคิวจาก Google Sheets...",
             no_queue: "ยังไม่มีคิวจองในระบบ",
             view_slip: "🖼️ เปิดดูสลิปโอนเงิน",
+            update_slip_btn: "📸 อัปเดตสลิป (แคชเชียร์)",
             alert_name: "❌ กรุณาใส่ชื่อลูกค้า ก่อนกดบันทึกครับ!",
             alert_menu: "❌ กรุณาเลือกเมนูก่อนบันทึกครับ!",
             alert_file_err: "❌ เกิดข้อผิดพลาดในการอ่านไฟล์",
             alert_success: "📌 บันทึกข้อมูลเรียบร้อยแล้ว!",
             alert_error: "❌ เกิดข้อผิดพลาด",
             alert_context: "🔒 ไม่อนุญาตให้คลิกขวาบนหน้าเว็บนี้เพื่อความปลอดภัยของระบบครับ",
-            menu1: "ข้าวราดแกง 1 อย่าง",
-            menu2: "ข้าวราดแกง 2 อย่าง",
-            menu3: "ข้าวราดแกง 3 อย่าง",
-            menu4: "ข้าวคลุกกะปิ",
+            menu1: "ราดข้าว 1 อย่าง",
+            menu2: "ราดข้าว 2 อย่าง",
+            menu3: "ราดข้าว 3 อย่าง",
+            menu4: "กับข้าว (40 บ.)",
+            menu5: "กับข้าว (30 บ.)",
+            menu6: "อาหารจานเดียว (30 บ.)",
+            menu7: "อาหารจานเดียว (40 บ.)",
+            menu8: "ข้าวเปล่า",
             egg1: "เพิ่มไข่ต้ม",
             egg2: "เพิ่มไข่ดาว",
-            egg3: "เพิ่มไข่ลูกเขย",
-            egg4: "เพิ่มไข่เจียวทรงเครื่อง"
+            egg3: "เพิ่มไข่เจียวทรงเครื่อง",
+            egg4: "เพิ่มไข่ลูกเขย",
+            egg5: "เพิ่มพะโล้"
         },
         my: {
-            shop_title: "🍛 မိုးကုတ်စက်ဝိုင်း ထမင်းဆိုင်",
+            shop_title: "🍛 မိုးကုတ်စက်ဝိုင်း ထมင်းဆိုင်",
             shop_subtitle: "ထမင်းနှင့်ဟင်း မှာယူမှုစနစ်",
-            bank_info_title: "ငွေလွှဲရန် အချက်အလက်များ:",
+            bank_info_title: "ငွေလွှဲရန် อချက်အလက်များ:",
             bank_name: "ကစီကွန်ဘဏ် (KBank)",
             bank_account_no: "အကောင့်နံပါတ်:",
             bank_account_name: "အကောင့်အမည်:",
@@ -393,20 +382,26 @@
             loading_text: "Google Sheets မှ အချက်အလက်များကို ဆွဲယူနေသည်...",
             no_queue: "စနစ်ထဲတွင် မှာယူမှုမရှိသေးပါ",
             view_slip: "🖼️ ငွေလွှဲပြေစာကြည့်ရန်",
+            update_slip_btn: "📸 ပြေစာအပ်ဒိတ် (ကက်ရှီယာ)",
             alert_name: "❌ မသိမ်းဆည်းမီ ဝယ်သူအမည်ကို ထည့်သွင်းပေးပါရန်!",
-            alert_menu: "❌ မသိမ်းဆည်းမီ မီနူးကို အရင်ရွေးချယ်ပေးပါရန်!",
+            alert_menu: "❌ မသိမ်းဆည်းမီ မีနူးကို အရင်ရွေးချယ်ပေးပါရန်!",
             alert_file_err: "❌ ဖိုင်ဖတ်ရာတွင် အမှားအယွင်းရှိနေပါသည်",
             alert_success: "📌 အချက်အလက်များကို အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ!",
             alert_error: "❌ အမှားအယွင်းရှိပါသည်",
             alert_context: "🔒 စနစ်လုံခြုံရေးအရ ဤဝဘ်ဆိုဒ်ပေါ်တွင် Right-Click နှိပ်ခွင့်မပြုပါ",
             menu1: "ထမင်းနှင့်ဟင်း ၁ မျိုး",
-            menu2: "ထမင်းและဟင်း ၂ မျိုး",
+            menu2: "ထမင်းနှင့်ဟင်း ၂ မျိုး",
             menu3: "ထမင်းနှင့်ဟင်း ၃ မျိုး",
-            menu4: "ငါးပိထမင်းနယ်",
+            menu4: "ဟင်းပွဲ (၄၀ ဘတ်)",
+            menu5: "ဟင်းပွဲ (၃၀ ဘတ်)",
+            menu6: "တစ်ပွဲစာ အစားအစာ (၃၀ ဘတ်)",
+            menu7: "တစ်ပွဲစာ အစားအစာ (၄၀ ဘတ်)",
+            menu8: "ထမင်းဖြူ",
             egg1: "ကြက်ဥပြုတ် ထပ်တိုး",
             egg2: "ကြက်ဥကြော် ထပ်တိုး",
-            egg3: "ခဲယိုကြက်ဥ ထပ်တိုး",
-            egg4: "ကြက်ဥမုန့်ကြော် ထပ်တိုး"
+            egg3: "ကြက်ဥမုန့်ကြော် ထပ်တိုး",
+            egg4: "ခဲယိုကြက်ဥ ထပ်တိုး",
+            egg5: "ပะလိုဟင်း ထပ်တိုး"
         },
         en: {
             shop_title: "🍛 Rimkhobpha Curry Rice",
@@ -432,6 +427,7 @@
             loading_text: "Loading queue from Google Sheets...",
             no_queue: "No bookings yet",
             view_slip: "🖼️ View Slip",
+            update_slip_btn: "📸 Update Slip (Cashier)",
             alert_name: "❌ Please enter your name!",
             alert_menu: "❌ Please select a menu!",
             alert_file_err: "❌ File error",
@@ -441,11 +437,16 @@
             menu1: "Rice + 1 Curry",
             menu2: "Rice + 2 Curries",
             menu3: "Rice + 3 Curries",
-            menu4: "Shrimp Paste Fried Rice",
+            menu4: "Side Dish (40 THB)",
+            menu5: "Side Dish (30 THB)",
+            menu6: "Single Dish (30 THB)",
+            menu7: "Single Dish (40 THB)",
+            menu8: "Plain Rice",
             egg1: "Add Boiled Egg",
             egg2: "Add Fried Egg",
-            egg3: "Add Scotch Egg",
-            egg4: "Add Omelet"
+            egg3: "Add Omelet",
+            egg4: "Add Scotch Egg",
+            egg5: "Add Stewed Pork"
         }
     };
 
@@ -477,16 +478,22 @@
         document.getElementById('custName').placeholder = langData[lang].placeholder_cust_name;
         document.getElementById('searchBox').placeholder = langData[lang].placeholder_search;
 
-        // อัปเดตข้อความบนปุ่มเมนูอาหารและปุ่มไข่ต่างๆ 
+        // อัปเดตข้อความบนปุ่มเมนูอาหารหลักทั้ง 8 รายการ
         document.getElementById('menu1').innerHTML = `${langData[lang].menu1} (30 ${langData[lang].currency})`;
         document.getElementById('menu2').innerHTML = `${langData[lang].menu2} (40 ${langData[lang].currency})`;
         document.getElementById('menu3').innerHTML = `${langData[lang].menu3} (50 ${langData[lang].currency})`;
         document.getElementById('menu4').innerHTML = `${langData[lang].menu4} (40 ${langData[lang].currency})`;
+        document.getElementById('menu5').innerHTML = `${langData[lang].menu5} (30 ${langData[lang].currency})`;
+        document.getElementById('menu6').innerHTML = `${langData[lang].menu6} (30 ${langData[lang].currency})`;
+        document.getElementById('menu7').innerHTML = `${langData[lang].menu7} (40 ${langData[lang].currency})`;
+        document.getElementById('menu8').innerHTML = `${langData[lang].menu8} (10 ${langData[lang].currency})`;
 
+        // อัปเดตข้อความบนปุ่มไข่/ตัวเลือกเสริม ทั้ง 5 รายการ
         document.getElementById('eggOpt1').innerHTML = `🥚 ${langData[lang].egg1} (+5 ${langData[lang].currency})`;
         document.getElementById('eggOpt2').innerHTML = `🥚 ${langData[lang].egg2} (+7 ${langData[lang].currency})`;
         document.getElementById('eggOpt3').innerHTML = `🥚 ${langData[lang].egg3} (+15 ${langData[lang].currency})`;
         document.getElementById('eggOpt4').innerHTML = `🥚 ${langData[lang].egg4} (+15 ${langData[lang].currency})`;
+        document.getElementById('eggOpt5').innerHTML = `🥚 ${langData[lang].egg5} (+20 ${langData[lang].currency})`;
 
         updateTotal();
         renderBookings(allBookings);
@@ -666,6 +673,28 @@
         return result.reverse();
     }
 
+    // ฟังก์ชันใหม่: เมื่อแคชเชียร์กดอัปเดตสลิปหน้าร้าน จะดึงชื่อและคำนวณยอดเงินให้อัตโนมัติ
+    function prepareCashierUpdate(name, menuText, price) {
+        clearForm(); // เคลียร์ค่าเดิมก่อน
+        
+        // 1. ใส่ชื่อลูกค้าลงในช่องฟอร์ม
+        document.getElementById('custName').value = name;
+        
+        // 2. จัดการจำลองการเลือกราคา เพื่อให้ยอดยังคงตรงตามที่สั่งมา
+        totalPrice = parseInt(price) || 0;
+        
+        // แสดงชื่อรายการและยอดรวมในกล่องสรุปผลโดยตรง
+        document.getElementById('resCust').innerText = name;
+        document.getElementById('resName').innerText = menuText;
+        document.getElementById('resPrice').innerText = totalPrice;
+
+        // เลื่อนหน้าจอขึ้นไปที่ฟอร์มด้านบน เพื่อให้แคชเชียร์กดแนบรูปได้สะดวก
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        // แจ้งเตือนเพื่อให้แคชเชียร์รู้ตัว
+        alert("📥 ดึงข้อมูลของคิว [" + name + "] แล้วเรียบร้อย! โปรดกด 'แนบสลิปการโอนเงิน' และกดบันทึกได้เลยค่ะ");
+    }
+
     function renderBookings(bookingsList) {
         let listSection = document.getElementById('bookingListSection');
         listSection.innerHTML = "";
@@ -678,16 +707,24 @@
         bookingsList.forEach(b => {
             let item = document.createElement('div');
             item.className = "booking-item";
-            let downloadBtn = "";
+            let actionBtn = "";
 
+            // ตรวจสอบว่าคิวนี้มีสลิปแล้วหรือยัง
             if (b.imgUrl && b.imgUrl.toString().startsWith("http")) {
-                downloadBtn = `<br><a href="${b.imgUrl}" target="_blank" style="display:inline-block; margin-top:6px; padding:4px 10px; background-color:#0288d1; color:white; border-radius:5px; text-decoration:none; font-size:12px; font-weight:bold;">${langData[currentLang].view_slip}</a>`;
+                // เคสที่ 1: มีสลิปแล้ว แสดงปุ่มเปิดดูสลิปปกติ
+                actionBtn = `<br><a href="${b.imgUrl}" target="_blank" style="display:inline-block; margin-top:6px; padding:4px 10px; background-color:#0288d1; color:white; border-radius:5px; text-decoration:none; font-size:12px; font-weight:bold;">${langData[currentLang].view_slip}</a>`;
+            } else {
+                // เคสที่ 2: ยังไม่มีสลิป แสดงปุ่มให้แคชเชียร์กดอัปเดตหน้าร้าน
+                // ปลอดภัยด้วยการแปลงเครื่องหมายคำพูดป้องกันโค้ดเอเรอร์ (Escape Strings)
+                let safeName = b.name.replace(/'/g, "\\'").replace(/"/g, '\\"');
+                let safeMenu = b.menu.replace(/'/g, "\\'").replace(/"/g, '\\"');
+                actionBtn = `<br><button type="button" onclick="prepareCashierUpdate('${safeName}', '${safeMenu}', '${b.price}')" style="display:inline-block; margin-top:6px; padding:4px 10px; background-color:#e65100; color:white; border:none; border-radius:5px; cursor:pointer; font-size:12px; font-weight:bold;">${langData[currentLang].update_slip_btn}</button>`;
             }
 
             item.innerHTML = `
                 <div class="booking-details">
                     <b>👤 ${b.name}</b>
-                    ${downloadBtn}
+                    ${actionBtn}
                     <br>
                     <small style="color:#666;">${b.menu}</small>
                 </div>
@@ -702,103 +739,4 @@
     function filterBookings() {
         let searchKeyword = document.getElementById('searchBox').value.toLowerCase().trim();
         if (searchKeyword === "") {
-            renderBookings(allBookings);
-            return;
-        }
-        let filtered = allBookings.filter(b => b.name.toLowerCase().includes(searchKeyword));
-        renderBookings(filtered);
-    }
-
-    function clearForm() {
-        document.getElementById('custName').value = "";
-        document.getElementById('slipFile').value = "";
-
-        selectedMenus = {};
-        selectedEggs = {};
-        totalPrice = 0;
-
-        for (let i = 1; i <= 4; i++) {
-            let menuBtn = document.getElementById('menu' + i);
-            let eggBtn = document.getElementById('eggOpt' + i);
-            if (menuBtn) menuBtn.classList.remove('active');
-            if (eggBtn) eggBtn.classList.remove('active');
-        }
-        updateTotal();
-    }
-
-    /* =======================================================
-        🔒 2. โค้ด JavaScript สำหรับบล็อกการคลิกขวาและบล็อกคีย์ลัด 
-       ======================================================= */
-    document.addEventListener('contextmenu', function(e) {
-        e.preventDefault();
-        alert(langData[currentLang].alert_context);
-    });
-
-    document.addEventListener('keydown', function(e) {
-        if (e.key === "F12" || e.keyCode === 123) {
-            e.preventDefault();
-            return false;
-        }
-        if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C' || e.key === 'i' || e.key === 'j' || e.key === 'c')) {
-            e.preventDefault();
-            return false;
-        }
-        if (e.ctrlKey && (e.key === 'u' || e.key === 'U')) {
-            e.preventDefault();
-            return false;
-        }
-        if (e.ctrlKey && (e.key === 's' || e.key === 'S')) {
-            e.preventDefault();
-            return false;
-        }
-        if (e.ctrlKey && (e.key === 'c' || e.key === 'C')) {
-            e.preventDefault();
-            return false;
-        }
-    });
-
-    /* =======================================================
-        📢 3. โค้ดสำหรับดึงข้อมูลการแจ้งเตือนจากชีท Announce (config)
-       ======================================================= */
-    async function fetchAnnouncement() {
-        const fileId = "1US69UZxdU7NTyP2y0nYmebshzbUIYfiO6V7NlJRI4EI"; 
-        const configUrl = `https://docs.google.com/spreadsheets/d/${fileId}/gviz/tq?sheet=config`;
-        
-        try {
-            let response = await fetch(configUrl + "&t=" + new Date().getTime());
-            let text = await response.text();
-            let rawData = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);/);
-            if (!rawData) return;
-            
-            let jsonData = JSON.parse(rawData[1]);
-            if (!jsonData.table || !jsonData.table.rows) return;
-            
-            jsonData.table.rows.forEach(row => {
-                if (!row.c) return;
-                let key = row.c[0] ? row.c[0].v : "";
-                let val = row.c[1] ? row.c[1].v : "";
-                
-                if (key === "announcement") {
-                    let bar = document.getElementById('announcement-bar');
-                    let textEl = document.getElementById('announcement-text');
-                    
-                    if (val && val.toString().trim() !== "") {
-                        textEl.innerText = val;
-                        bar.style.display = "block";
-                    } else {
-                        bar.style.display = "none";
-                    }
-                }
-            });
-        } catch (e) {
-            console.error("ดึงข้อมูลจากไฟล์ Announce ไม่ได้:", e);
-        }
-    }
-
-    // สั่งรันดึงประกาศทันที และดึงซ้ำทุกๆ 10 วินาที
-    setInterval(fetchAnnouncement, 10000);
-    fetchAnnouncement();
-
-</script>
-</body>
-</html>
+            renderBookings(
