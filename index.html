@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ร้านข้าวราดแกงริมขอบฟ้า v5.3 (Fixed Complete)</title>
+    <title>ร้านข้าวราดแกงริมขอบฟ้า v5.4 (Fixed Double Submit)</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -310,6 +310,7 @@
     let totalPrice = 0;
     let allBookings = [];
     let currentLang = 'th'; 
+    let isSubmitting = false; // ตัวแปรป้องกันการกดบันทึกซ้ำซ้อน
 
     const langData = {
         th: {
@@ -554,6 +555,8 @@
     }
 
     async function saveDirectToSheet() {
+        if (isSubmitting) return; // ถ้ากำลังส่งข้อมูลอยู่ จะไม่ทำซ้ำอีกรอบเด็ดขาด 🔒
+
         let name = document.getElementById('custName').value.trim();
         let menuNamesArray = [];
 
@@ -578,6 +581,8 @@
             return;
         }
 
+        // เริ่มต้นล็อกปุ่มและตั้งสถานะการส่งข้อมูล เพื่อกัน Double Submit
+        isSubmitting = true;
         let btn = document.getElementById('btnSave');
         btn.disabled = true;
         btn.innerText = langData[currentLang].btn_saving;
@@ -599,6 +604,7 @@
                 alert(langData[currentLang].alert_file_err);
                 btn.disabled = false;
                 btn.innerText = langData[currentLang].btn_save;
+                isSubmitting = false;
                 return;
             }
         }
@@ -618,8 +624,10 @@
             alert(langData[currentLang].alert_error);
         })
         .finally(() => {
+            // ปลดล็อกให้ปุ่มสามารถใช้งานใหม่ได้เฉพาะหลังจากทำทุกอย่างเสร็จสิ้นแล้วเท่านั้น
             btn.disabled = false;
             btn.innerText = langData[currentLang].btn_save;
+            isSubmitting = false;
         });
     }
 
