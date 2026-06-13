@@ -12,11 +12,13 @@
 </head>
 <body>
     <h2>👨‍🍳 รายการที่ต้องตัก</h2>
-    <div class="grid-container" id="kitchenGrid">กำลังโหลด...</div>
+    <div class="grid-container" id="kitchenGrid">กำลังโหลดข้อมูล...</div>
 
     <script>
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyzpxoVFs48gulO5NAw1kyir1s5SILdCyX1Qf0gZ-1RoV8iTAoZdGPKk-ZGWeymz72JEA/exec";
-        const SS_URL = "https://docs.google.com/spreadsheets/d/1sZB3Mx32-Vmx81EZQlnWQ4XByVhWnOdyaZPHQxjhQzU/gviz/tq?tqx=out:json&sheet=inventory";
+        // ใส่ Sheet ID ของพี่
+        const SS_ID = "1sZB3Mx32-Vmx81EZQlnWQ4XByVhWnOdyaZPHQxjhQzU";
+        const SS_URL = `https://docs.google.com/spreadsheets/d/${SS_ID}/gviz/tq?tqx=out:json&sheet=inventory`;
 
         async function loadOrders() {
             try {
@@ -26,7 +28,8 @@
                 let grid = document.getElementById('kitchenGrid');
                 grid.innerHTML = "";
                 
-                json.table.rows.forEach(row => {
+                json.table.rows.forEach((row, index) => {
+                    // ตรวจสอบข้อมูลแต่ละคอลัมน์ (คอลัมน์ 0=ชื่อ, 1=รายการ, 4=สถานะ)
                     let name = row.c[0]?.v;
                     let food = row.c[1]?.v;
                     let status = row.c[4]?.v;
@@ -39,16 +42,27 @@
                         grid.appendChild(div);
                     }
                 });
-            } catch(e) { document.getElementById('kitchenGrid').innerHTML = "โหลดข้อมูลไม่สำเร็จ (ลองแชร์ Sheet เป็นสาธารณะ)"; }
+            } catch(e) { 
+                document.getElementById('kitchenGrid').innerHTML = "เกิดข้อผิดพลาดในการโหลดข้อมูล: " + e.message; 
+            }
         }
 
         async function updateStatus(name, btn) {
             btn.innerText = "⏳ กำลังบันทึก...";
             try {
-                // ส่งค่าผ่าน Query Parameter (เสถียรที่สุด)
-                await fetch(`${WEB_APP_URL}?action=update_status&name=${encodeURIComponent(name)}`, { method: "POST" });
-                btn.parentElement.remove();
-            } catch(e) { alert("พลาด! ตรวจสอบสิทธิ์ Apps Script"); btn.innerText = "✅ ตักสำเร็จ"; }
+                // ส่งชื่อไปอัปเดตสถานะที่ Google Apps Script
+                let res = await fetch(`${WEB_APP_URL}?action=update_status&name=${encodeURIComponent(name)}`, { method: "POST" });
+                let result = await res.json();
+                if (result.status === "success") {
+                    btn.parentElement.remove();
+                } else {
+                    alert("ไม่สามารถอัปเดตสถานะได้");
+                    btn.innerText = "✅ ตักสำเร็จ";
+                }
+            } catch(e) { 
+                alert("เกิดข้อผิดพลาด: " + e.message); 
+                btn.innerText = "✅ ตักสำเร็จ";
+            }
         }
         
         loadOrders();
