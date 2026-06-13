@@ -43,20 +43,27 @@
                 if (!found) grid.innerHTML = "<div style='grid-column:1/-1; text-align:center;'>🎉 ตักครบหมดแล้ว!</div>";
             } catch (e) { document.getElementById('kitchenGrid').innerHTML = "เกิดข้อผิดพลาดในการโหลด"; }
         }
+// ในฟังก์ชัน fetchKitchenOrders ตอนสร้างปุ่ม ให้เปลี่ยนเป็น:
+// onclick="markAsDone('${name}', this)"
 
-        async function markAsDone(rowIndex, btn) {
-            btn.disabled = true;
-            btn.innerText = "⏳ กำลังบันทึก...";
-            try {
-                // ส่งค่าผ่าน URL แบบ QueryString
-                await fetch(`${WEB_APP_URL}?action=update_status&row_index=${rowIndex}`, { method: "POST" });
-                document.getElementById("row-" + rowIndex).remove();
-            } catch (e) {
-                alert("ส่งข้อมูลพลาด! ลองอีกครั้ง");
-                btn.disabled = false;
-                btn.innerText = "✅ ตักสำเร็จ";
-            }
-        }
+async function markAsDone(empName, btn) {
+    btn.disabled = true;
+    btn.innerText = "⏳ กำลังบันทึก...";
+    
+    // ส่งชื่อไปอัปเดต
+    const url = `${WEB_APP_URL}?action=update_status&name=${encodeURIComponent(empName)}`;
+    
+    try {
+        await fetch(url, { method: "POST" });
+        // หายไปจากหน้าจอ
+        btn.parentElement.remove(); 
+    } catch (e) {
+        alert("พลาด!");
+        btn.disabled = false;
+        btn.innerText = "✅ ตักสำเร็จ";
+    }
+}
+
         window.onload = fetchKitchenOrders;
         setInterval(fetchKitchenOrders, 5000);
     </script>
