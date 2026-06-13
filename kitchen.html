@@ -102,19 +102,20 @@
                 let count = 0;
 
                 // วนลูปอ่านข้อมูลทุกแถวเพื่อหาเฉพาะรายการที่ "รอตัก"
-               // เปลี่ยนลูป for ในไฟล์ kitchen.html ให้เป็นชุดนี้ครับ
-for (let i = 1; i < rows.length; i++) {
+                // เปลี่ยนลูป for ในไฟล์ kitchen.html ให้เป็นชุดนี้ครับ
+// วนลูปอ่านข้อมูล แต่จำกัดให้แสดงผลแค่ 100 แถวแรกเท่านั้น
+let limit = Math.min(rows.length, 101); // 101 เพราะแถวที่ 1 คือหัวตาราง
+for (let i = 1; i < limit; i++) {
     let row = rows[i];
     if (!row.c || !row.c[0]) continue;
     
     let name = row.c[0] ? row.c[0].v : "";
     let food = row.c[1] ? row.c[1].v : "";
-    // อ่านค่าจากคอลัมน์ E (ดัชนีที่ 4)
     let status = row.c[4] ? row.c[4].v.toString().trim() : ""; 
     let rowIndex = i + 1; 
 
-    // ✅ กรองให้แสดงเฉพาะแถวที่เป็นคำว่า "รอตัก" เท่านั้น (ต้องพิมพ์ให้ตรงเป๊ะ)
-    if (status === "รอตัก" || status === "รอตัก ") {
+    // กรองให้แสดงเฉพาะแถวที่เป็นคำว่า "รอตัก"
+    if (status === "รอตัก") {
         count++;
         let card = document.createElement('div');
         card.className = "order-card";
