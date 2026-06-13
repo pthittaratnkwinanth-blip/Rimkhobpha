@@ -25,44 +25,49 @@
         const SS_ID = "1sZB3Mx32-Vmx81EZQlnWQ4XByVhWnOdyaZPHQxjhQzU";
 
         async function fetchKitchenOrders() {
-            const url = `https://docs.google.com/spreadsheets/d/${SS_ID}/gviz/tq?sheet=inventory&t=${new Date().getTime()}`;
-            try {
-                let response = await fetch(url);
-                let text = await response.text();
-                let rawData = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);/);
-                if (!rawData) return;
-                
-                let jsonData = JSON.parse(rawData[1]);
-                let rows = jsonData.table.rows;
-                let grid = document.getElementById('kitchenGrid');
-                grid.innerHTML = "";
-                
-                let found = false;
-                for (let i = 1; i < rows.length; i++) {
-                    let row = rows[i];
-                    if (!row.c || !row.c[0]) continue;
-                    
-                    let name = row.c[0]?.v || "";
-                    let food = row.c[1]?.v || "";
-                    let status = row.c[4]?.v?.toString().trim() || ""; 
+    // เพิ่ม cachebust เพื่อบังคับให้ดึงข้อมูลใหม่ล่าสุดเสมอ
+    const url = `https://docs.google.com/spreadsheets/d/${SS_ID}/gviz/tq?sheet=inventory&t=${new Date().getTime()}&cachebust=${Math.random()}`;
+    
+    try {
+        let response = await fetch(url);
+        let text = await response.text();
+        let rawData = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);/);
+        if (!rawData) return;
+        
+        let jsonData = JSON.parse(rawData[1]);
+        let rows = jsonData.table.rows;
+        let grid = document.getElementById('kitchenGrid');
+        grid.innerHTML = "";
+        
+        let found = false;
+        for (let i = 1; i < rows.length; i++) {
+            let row = rows[i];
+            if (!row.c || !row.c[0]) continue;
+            
+            let name = row.c[0]?.v || "";
+            let food = row.c[1]?.v || "";
+            // ยืนยันว่าอ่านคอลัมน์ที่ 5 (index 4) ถูกต้อง
+            let status = row.c[4]?.v?.toString().trim() || ""; 
 
-                    if (status === "รอตัก") {
-                        found = true;
-                        let card = document.createElement('div');
-                        card.className = "order-card";
-                        card.innerHTML = `
-                            <div>
-                                <div class="emp-name">${name}</div>
-                                <div class="menu-details">${food}</div>
-                            </div>
-                            <button class="btn-done" onclick="markAsDone(${i + 1}, this)">✅ ตักสำเร็จ</button>
-                        `;
-                        grid.appendChild(card);
-                    }
-                }
-                if (!found) grid.innerHTML = "<div style='grid-column:1/-1; text-align:center;'>🎉 ตักครบหมดแล้ว!</div>";
-            } catch (e) { console.error("Error fetching:", e); }
+            // ตรวจสอบสถานะให้ชัวร์ว่าต้องเป็น "รอตัก" เท่านั้น
+            if (status === "รอตัก") {
+                found = true;
+                let card = document.createElement('div');
+                card.className = "order-card";
+                card.id = "row-" + (i + 1);
+                card.innerHTML = `
+                    <div>
+                        <div class="emp-name">${name}</div>
+                        <div class="menu-details">${food}</div>
+                    </div>
+                    <button class="btn-done" onclick="markAsDone(${i + 1}, this)">✅ ตักสำเร็จ</button>
+                `;
+                grid.appendChild(card);
+            }
         }
+        if (!found) grid.innerHTML = "<div style='grid-column:1/-1; text-align:center;'>🎉 ตักครบหมดแล้ว!</div>";
+    } catch (e) { console.error("ดึงข้อมูลพลาด:", e); }
+}
 
         async function markAsDone(rowIndex, btn) {
             btn.disabled = true;
