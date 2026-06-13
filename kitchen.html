@@ -70,28 +70,28 @@
 }
 
         async function markAsDone(rowIndex, btn) {
-            btn.disabled = true;
-            btn.innerText = "⏳ กำลังบันทึก...";
+    btn.disabled = true;
+    btn.innerText = "⏳ กำลังบันทึก...";
 
-            try {
-                // ส่งข้อมูลแบบ URLSearchParams (เสถียรกว่า FormData สำหรับ Apps Script)
-                const response = await fetch(WEB_APP_URL, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                    body: new URLSearchParams({
-                        action: "update_status",
-                        row_index: rowIndex
-                    })
-                });
-                
-                // หลังจากส่งสำเร็จ ให้โหลดข้อมูลใหม่ทันที
-                await fetchKitchenOrders();
-            } catch (e) { 
-                alert("เกิดข้อผิดพลาด! กรุณาลองใหม่"); 
-                btn.disabled = false;
-                btn.innerText = "✅ ตักสำเร็จ";
-            }
-        }
+    try {
+        // ใช้ URLSearchParams แทน FormData เพื่อความเสถียร
+        const params = new URLSearchParams();
+        params.append('action', 'update_status');
+        params.append('row_index', rowIndex);
+
+        const response = await fetch(WEB_APP_URL, {
+            method: "POST",
+            body: params
+        });
+
+        // ลบแถวทิ้งทันทีเมื่อส่งสำเร็จ
+        document.getElementById("row-" + rowIndex).remove();
+    } catch (e) {
+        alert("เชื่อมต่อไม่ได้! ลองใหม่อีกครั้ง");
+        btn.disabled = false;
+        btn.innerText = "✅ ตักสำเร็จ";
+    }
+}
 
         window.onload = () => { fetchKitchenOrders(); setInterval(fetchKitchenOrders, 5000); };
     </script>
