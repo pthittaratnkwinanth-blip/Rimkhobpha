@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ร้านข้าวราดแกงริมขอบฟ้า v5.5 (Auto Stock Integration)</title>
+    <title>ร้านข้าวราดแกงริมขอบฟ้า v5.4 (Fixed Double Submit)</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -304,208 +304,532 @@
         <div class="booking-list" id="bookingListSection" data-key="loading_text">กำลังโหลดคิวจาก Google Sheets...</div>
     </div>
 
-    <script>
-        let selectedMenus = {};
-        let selectedEggs = {};
-        let totalPrice = 0;
-        let allBookings = [];
-        let currentLang = 'th';
-        let isSubmitting = false; // ป้องกันการเบิ้ลส่งซ้ำ
+<script>
+    let selectedMenus = {};
+    let selectedEggs = {};
+    let totalPrice = 0;
+    let allBookings = [];
+    let currentLang = 'th'; 
+    let isSubmitting = false; // ตัวแปรป้องกันการกดบันทึกซ้ำซ้อน
 
-        // 🚨 สำคัญมาก: ใส่ URL ของ Web App (Google Apps Script) ที่พี่ปัถย์สั่งใช้งานลงในนี้ครับ
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyB_p-HiZghk5Mmdrad0RoGv3wCPqru0LVtTWBSm1eNdF7Wc0KBnYUXi2srkDZPnHcQjg/exec"; 
+    const langData = {
+        th: {
+            shop_title: "🍛 ร้านข้าวราดแกงริมขอบฟ้า",
+            shop_subtitle: "ระบบการจองข้าวราดแกง",
+            bank_info_title: "ข้อมูลการโอนเงิน:",
+            bank_name: "ธนาคารกสิกรไทย (KBank)",
+            bank_account_no: "เลขที่บัญชี:",
+            bank_account_name: "ชื่อบัญชี:",
+            label_cust_name: "ชื่อลูกค้า หรือ รหัสการจอง:",
+            placeholder_cust_name: "เช่น คนสวย / โต๊ะ 5 / บอส01",
+            placeholder_search: "🔍 พิมพ์ค้นหา ชื่อ หรือ รหัสจอง...",
+            label_slip: "แนบสลิปการโอนเงิน (ถ้ามี):",
+            res_customer_label: "ลูกค้า:",
+            res_customer_default: "หน้าร้าน (ไม่ได้จอง)",
+            res_menu_label: "รายการ:",
+            res_menu_default: "ยังไม่ได้เลือกเมนู",
+            res_total_label: "ยอดรวม:",
+            currency: "บาท",
+            btn_save: "📌 บันทึกรายการจองนี้",
+            btn_saving: "⏳ กำลังส่งข้อมูล...",
+            list_title: "📋 รายชื่อลูกค้าที่จองไว้ทั้งหมด",
+            admin_warning: "🔄 รายชื่ออัปเดตอัตโนมัติจากระบบส่วนกลาง (Real-Time)",
+            loading_text: "กำลังโหลดคิวจาก Google Sheets...",
+            no_queue: "ยังไม่มีคิวจองในระบบ",
+            view_slip: "🖼️ เปิดดูสลิปโอนเงิน",
+            update_slip_btn: "📸 อัปเดตสลิป (แคชเชียร์)",
+            alert_name: "❌ กรุณาใส่ชื่อลูกค้า ก่อนกดบันทึกครับ!",
+            alert_menu: "❌ กรุณาเลือกเมนูก่อนบันทึกครับ!",
+            alert_file_err: "❌ เกิดข้อผิดพลาดในการอ่านไฟล์",
+            alert_success: "📌 บันทึกข้อมูลเรียบร้อยแล้ว!",
+            alert_error: "❌ เกิดข้อผิดพลาด",
+            alert_context: "🔒 ไม่อนุญาตให้คลิกขวาบนหน้าเว็บนี้เพื่อความปลอดภัยของระบบครับ",
+            menu1: "ราดข้าว 1 อย่าง",
+            menu2: "ราดข้าว 2 อย่าง",
+            menu3: "ราดข้าว 3 อย่าง",
+            menu4: "กับข้าว (40 บ.)",
+            menu5: "กับข้าว (30 บ.)",
+            menu6: "อาหารจานเดียว (30 บ.)",
+            menu7: "อาหารจานเดียว (40 บ.)",
+            menu8: "ข้าวเปล่า",
+            egg1: "เพิ่มไข่ต้ม",
+            egg2: "เพิ่มไข่ดาว",
+            egg3: "เพิ่มไข่เจียวทรงเครื่อง",
+            egg4: "เพิ่มไข่ลูกเขย",
+            egg5: "เพิ่มพะโล้"
+        },
+        my: {
+            shop_title: "🍛 မိုးကုတ်စက်ဝိုင်း ထမင်းဆိုင်",
+            shop_subtitle: "ထမင်းနှင့်ဟင်း မှာယူမှုစနစ်",
+            bank_info_title: "ငွေလွှဲရန် အချက်အလက်များ:",
+            bank_name: "ကစီကွန်ဘဏ် (KBank)",
+            bank_account_no: "အကောင့်နံပါတ်:",
+            bank_account_name: "အကောင့်အမည်:",
+            label_cust_name: "ဝယ်သူအမည် သို့မဟုတ် မှာယူမှုကုဒ်:",
+            placeholder_cust_name: "ဥပမာ- အလှလေး / စားပွဲ ၅ / Boss01",
+            placeholder_search: "🔍 အမည် သို့မဟုတ် ကုဒ်ဖြင့် ရှာဖွေရန်...",
+            label_slip: "ငွေလွှဲပြေစာ ပူးတွဲပါ (ရှိလျှင်):",
+            res_customer_label: "ဝယ်သူ:",
+            res_customer_default: "ဆိုင်တွင် တိုက်ရိုက် (မမှာယူထားပါ)",
+            res_menu_label: "မီနူးစာရင်း:",
+            res_menu_default: "မီနူးမရွေးရသေးပါ",
+            res_total_label: "စုစုပေါင်း:",
+            currency: "ဘတ်",
+            btn_save: "📌 ဤမှာယူမှုကို သိမ်းဆည်းမည်",
+            btn_saving: "⏳ အချက်အလက်များ ပို့နေသည်...",
+            list_title: "📋 မှာယူထားသော ဝယ်သူများစာရင်း",
+            admin_warning: "🔄 ဗဟိုစနစ်မှ အချက်အလက်များကို အလိုအလျောက် အပ်ဒိတ်လုပ်နေသည် (Real-Time)",
+            loading_text: "Google Sheets မှ အချက်အလက်များကို ဆွဲယူနေသည်...",
+            no_queue: "စနစ်ထဲတွင် မှာယူမှုမရှိသေးပါ",
+            view_slip: "🖼️ ငွေလွှဲပြေစာကြည့်ရန်",
+            update_slip_btn: "📸 ပြေစာအပ်ဒိတ် (ကက်ရှီယာ)",
+            alert_name: "❌ မသိမ်းဆည်းမီ ဝယ်သူအမည်ကို ထည့်သွင်းပေးပါရန်!",
+            alert_menu: "❌ မသိမ်းဆည်းမီ မီနူးကို အရင်ရွေးချယ်ပေးပါရန်!",
+            alert_file_err: "❌ ဖိုင်ဖတ်ရာတွင် အမှားအယွင်းရှိနေပါသည်",
+            alert_success: "📌 အချက်အလက်များကို အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ!",
+            alert_error: "❌ အမှားအယွင်းရှိပါသည်",
+            alert_context: "🔒 စနစ်လုံခြုံရေးအရ ဤဝဘ်ဆိုဒ်ပေါ်တွင် Right-Click နှိပ်ခွင့်မပြုပါ",
+            menu1: "ထမင်းနှင့်ဟင်း ၁ မျိုး",
+            menu2: "ထမင်းနှင့်ဟင်း ၂ မျိုး",
+            menu3: "ထမင်းနှင့်ဟင်း ၃ မျိုး",
+            menu4: "ဟင်းပွဲ (၄၀ ဘတ်)",
+            menu5: "ဟင်းပွဲ (၃၀ ဘတ်)",
+            menu6: "တစ်ပွဲစာ အစားအစာ (၃၀ ဘတ်)",
+            menu7: "တစ်ပွဲစာ အစားအစာ (၄၀ ဘတ်)",
+            menu8: "ထမင်းဖြူ",
+            egg1: "ကြက်ဥပြုတ် ထပ်တိုး",
+            egg2: "ကြက်ဥကြော် ထပ်တိုး",
+            egg3: "ကြက်ဥမုန့်ကြော် ထပ်တိုး",
+            egg4: "ခဲယိုကြက်ဥ ထပ်တိုး",
+            egg5: "ပဥလိုဟင်း ထပ်တိုး"
+        },
+        en: {
+            shop_title: "🍛 Rimkhobpha Curry Rice",
+            shop_subtitle: "Curry Rice Booking System",
+            bank_info_title: "Payment Information:",
+            bank_name: "Kasikorn Bank (KBank)",
+            bank_account_no: "Account Number:",
+            bank_account_name: "Account Name:",
+            label_cust_name: "Customer Name or Booking ID:",
+            placeholder_cust_name: "e.g., John / Table 5 / Boss01",
+            placeholder_search: "🔍 Search by name or ID...",
+            label_slip: "Attach Payment Slip (if any):",
+            res_customer_label: "Customer:",
+            res_customer_default: "Walk-in (No booking)",
+            res_menu_label: "Items:",
+            res_menu_default: "No menu selected",
+            res_total_label: "Total:",
+            currency: "THB",
+            btn_save: "📌 Save Booking",
+            btn_saving: "⏳ Sending...",
+            list_title: "📋 Booking List",
+            admin_warning: "🔄 Real-time update from central system",
+            loading_text: "Loading queue from Google Sheets...",
+            no_queue: "No bookings yet",
+            view_slip: "🖼️ View Slip",
+            update_slip_btn: "📸 Update Slip (Cashier)",
+            alert_name: "❌ Please enter your name!",
+            alert_menu: "❌ Please select a menu!",
+            alert_file_err: "❌ File error",
+            alert_success: "📌 Saved successfully!",
+            alert_error: "❌ Error occurred",
+            alert_context: "🔒 Right-click is disabled for security.",
+            menu1: "Rice + 1 Curry",
+            menu2: "Rice + 2 Curries",
+            menu3: "Rice + 3 Curries",
+            menu4: "Side Dish (40 THB)",
+            menu5: "Side Dish (30 THB)",
+            menu6: "Single Dish (30 THB)",
+            menu7: "Single Dish (40 THB)",
+            menu8: "Plain Rice",
+            egg1: "Add Boiled Egg",
+            egg2: "Add Fried Egg",
+            egg3: "Add Omelet",
+            egg4: "Add Scotch Egg",
+            egg5: "Add Stewed Pork"
+        }
+    };
 
-        const langData = {
-            th: {
-                shop_title: "🍛 ร้านข้าวราดแกงริมขอบฟ้า",
-                shop_subtitle: "ระบบการจองข้าวราดแกง",
-                bank_info_title: "ข้อมูลการโอนเงิน:",
-                bank_name: "ธนาคารกสิกรไทย (KBank)",
-                bank_account_no: "เลขที่บัญชี:",
-                bank_account_name: "ชื่อบัญชี:",
-                label_cust_name: "ชื่อลูกค้า หรือ รหัสการจอง:",
-                placeholder_cust_name: "เช่น คนสวย / โต๊ะ 5 / บอส01",
-                placeholder_search: "🔍 พิมพ์ค้นหา ชื่อ หรือ รหัสจอง...",
-                label_slip: "แนบสลิปการโอนเงิน (ถ้ามี):",
-                res_customer_label: "ลูกค้า:",
-                res_customer_default: "หน้าร้าน (ไม่ได้จอง)",
-                res_menu_label: "รายการ:",
-                res_menu_default: "ยังไม่ได้เลือกเมนู",
-                res_total_label: "ยอดรวม:",
-                currency: "บาท",
-                btn_save: "📌 บันทึกรายการจองนี้",
-                btn_saving: "⏳ กำลังส่งข้อมูล...",
-                list_title: "📋 รายชื่อลูกค้าที่จองไว้ทั้งหมด",
-                admin_warning: "🔄 รายชื่ออัปเดตอัตโนมัติจากระบบส่วนกลาง (Real-Time)",
-                loading_text: "กำลังโหลดคิวจาก Google Sheets...",
-                no_queue: "ยังไม่มีคิวจองในระบบ",
-                view_slip: "🖼️ เปิดดูสลิปโอนเงิน",
-                update_slip_btn: "📸 อัปเดตสลิป (แคชเชียร์)",
-                alert_name: "❌ กรุณาใส่ชื่อลูกค้า ก่อนกดบันทึกครับ!",
-                alert_menu: "❌ กรุณาเลือกเมนูก่อนบันทึกครับ!",
-                alert_file_err: "❌ เกิดข้อผิดพลาดในการอ่านไฟล์",
-                alert_success: "📌 บันทึกข้อมูลเรียบร้อยแล้ว!",
-                alert_error: "❌ เกิดข้อผิดพลาด",
-                alert_context: "🔒 ไม่อนุญาตให้คลิกขวาบนหน้าเว็บนี้เพื่อความปลอดภัยของระบบครับ",
-                menu1: "ราดข้าว 1 อย่าง", menu2: "ราดข้าว 2 อย่าง", menu3: "ราดข้าว 3 อย่าง",
-                menu4: "กับข้าว (40 บ.)", menu5: "กับข้าว (30 บ.)", menu6: "อาหารจานเดียว (30 บ.)",
-                menu7: "อาหารจานเดียว (40 บ.)", menu8: "ข้าวเปล่า",
-                egg1: "เพิ่มไข่ต้ม", egg2: "เพิ่มไข่ดาว", egg3: "เพิ่มไข่เจียวทรงเครื่อง", egg4: "เพิ่มไข่ลูกเขย", egg5: "เพิ่มพะโล้"
-            },
-            my: {
-                shop_title: "🍛 မိုးကုတ်စက်ဝိုင်း ထမင်းဆိုင်",
-                shop_subtitle: "ထမင်းနှင့် ဟင်းမှာယူခြင်း စနစ်",
-                bank_info_title: "ငွေလွှဲရန် အချက်အလက်များ:",
-                bank_name: "KBank ဘဏ်",
-                bank_account_no: "အကောင့်နံပါတ်:",
-                bank_account_name: "အကောင့်အမည်:",
-                label_cust_name: "ဝယ်သူအမည် သို့မဟုတ် စားပွဲနံပါတ်:",
-                placeholder_cust_name: "ဥပမာ- ချောချော / စားပွဲ ၅",
-                placeholder_search: "🔍 ရှာဖွေရန် အမည် ရိုက်ထည့်ပါ...",
-                label_slip: "ငွေလွှဲဖြတ်ပိုင်း ပူးတွဲရန် (ရှိပါက):",
-                res_customer_label: "ဝယ်သူ:",
-                res_customer_default: "ဆိုင်တွင် တိုက်ရိုက်ဝယ်ယူသူ",
-                res_menu_label: "မှာယူသည့်အရာ:",
-                res_menu_default: "ဟင်းပွဲ မရွေးချယ်ရသေးပါ",
-                res_total_label: "စုစုပေါင်း:",
-                currency: "ဘတ်",
-                btn_save: "📌 မှာယူမှုကို သိမ်းဆည်းမည်",
-                btn_saving: "⏳ ပို့ဆောင်နေပါသည်...",
-                list_title: "📋 မှာယူထားသူများ စာရင်း",
-                admin_warning: "🔄 ဗဟိုစနစ်မှ အချက်အလက်များ အလိုအလျောက် အပ်ဒိတ်ဖြစ်နေပါသည် (Real-Time)",
-                loading_text: "Google Sheets မှ အချက်အလက်များကို ရယူနေပါသည်...",
-                no_queue: "စနစ်ထဲတွင် မှာယူထားသူ မရှိသေးပါ",
-                view_slip: "🖼️ ဖြတ်ပိုင်းကို ကြည့်ရန်",
-                update_slip_btn: "📸 ဖြတ်ပိုင်းအပ်ဒိတ်လုပ်ရန်",
-                alert_name: "❌ မသိမ်းဆည်းမီ ဝယ်သူအမည်ကို အရင်ရိုက်ထည့်ပါ!",
-                alert_menu: "❌ မသိမ်းဆည်းမီ ဟင်းပွဲကို အရင်ရွေးချယ်ပါ!",
-                alert_file_err: "❌ ဖိုင်ဖတ်ရာတွင် အမှားအယွင်းရှိပါသည်",
-                alert_success: "📌 အချက်အလက်များကို အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ!",
-                alert_error: "❌ အမှားအယွင်း ရှိပါသည်",
-                alert_context: "🔒 စနစ်လုံခြုံရေးအရ Right-Click နှိပ်ခွင့်မပြုပါ",
-                menu1: "ထမင်း + ဟင်း ၁ မျိုး", menu2: "ထမင်း + ဟင်း ၂ မျိုး", menu3: "ထမင်း + ဟင်း ၃ မျိုး",
-                menu4: "ဟင်းပွဲ (၄၀ ဘတ်)", menu5: "ဟင်းပွဲ (၃၀ ဘတ်)", menu6: "တစ်ပွဲစာ အစားအစာ (၃၀ ဘတ်)",
-                menu7: "တစ်ပွဲစာ အစားအစာ (၄၀ ဘတ်)", menu8: "ထမင်းဗလာ",
-                egg1: "ကြက်ဥပြုတ် ထည့်မည်", egg2: "ကြက်ဥကြော် ထည့်မည်", egg3: "ကြက်ဥမွှေကြော် ထည့်မည်", egg4: "ခါကြက်ဥ ထည့်မည်", egg5: "ဘဲဥပะလိုး ထည့်မည်"
-            },
-            en: {
-                shop_title: "🍛 Rim Khob Fah Rice & Curry",
-                shop_subtitle: "Food Ordering & Booking System",
-                bank_info_title: "Bank Transfer Information:",
-                bank_name: "Kasikorn Bank (KBank)",
-                bank_account_no: "Account No:",
-                bank_account_name: "Account Name:",
-                label_cust_name: "Customer Name / Table No:",
-                placeholder_cust_name: "e.g. Beautiful / Table 5 / Boss01",
-                placeholder_search: "🔍 Search name or booking ID...",
-                label_slip: "Attach Transfer Slip (If any):",
-                res_customer_label: "Customer:",
-                res_customer_default: "Walk-in (No Booking)",
-                res_menu_label: "Order details:",
-                res_menu_default: "No menu selected",
-                res_total_label: "Total:",
-                currency: "THB",
-                btn_save: "📌 Confirm & Save Order",
-                btn_saving: "⏳ Submitting data...",
-                list_title: "📋 All Current Bookings",
-                admin_warning: "🔄 Real-time automatic updates from main server",
-                loading_text: "Loading queues from Google Sheets...",
-                no_queue: "No active queue found",
-                view_slip: "🖼️ View Transfer Slip",
-                update_slip_btn: "📸 Update Slip (Cashier)",
-                alert_name: "❌ Please enter Customer Name before saving!",
-                alert_menu: "❌ Please select at least one menu item!",
-                alert_file_err: "❌ Error reading slip file",
-                alert_success: "📌 Booking saved successfully!",
-                alert_error: "❌ An error occurred",
-                alert_context: "🔒 Right-click is disabled for security reasons.",
-                menu1: "Rice + 1 Curry", menu2: "Rice + 2 Curries", menu3: "Rice + 3 Curries",
-                menu4: "Curry Dish (40 B.)", menu5: "Curry Dish (30 B.)", menu6: "Single Dish (30 B.)",
-                menu7: "Single Dish (40 B.)", menu8: "Plain Rice",
-                egg1: "Add Boiled Egg", egg2: "Add Fried Egg", egg3: "Add Omelet", egg4: "Add Look-Kuey Egg", egg5: "Add Palo Soup"
+    const fetchUrl = "https://docs.google.com/spreadsheets/d/1sZB3Mx32-Vmx81EZQlnWQ4XByVhWnOdyaZPHQxjhQzU/gviz/tq?sheet=inventory";
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbyB_p-HiZghk5Mmdrad0RoGv3wCPqru0LVtTWBSm1eNdF7Wc0KBnYUXi2srkDZPnHcQjg/exec";
+
+    fetchSheetData();
+    setInterval(fetchSheetData, 5000);
+
+    function switchLanguage(lang) {
+        currentLang = lang;
+        document.documentElement.lang = lang;
+        
+        document.getElementById('lang-th').classList.toggle('active', lang === 'th');
+        document.getElementById('lang-my').classList.toggle('active', lang === 'my');
+        document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+
+        document.querySelectorAll('[data-key]').forEach(el => {
+            const key = el.getAttribute('data-key');
+            if (langData[lang][key]) {
+                el.innerText = langData[lang][key];
             }
-        };
-
-        // ตรวจจับพิมพ์ชื่อลูกค้าให้แสดง Realtime ในกรอบเหลือง
-        document.getElementById('custName').addEventListener('input', function() {
-            let val = this.value.trim();
-            document.getElementById('resCust').innerText = val !== "" ? val : langData[currentLang].res_customer_default;
         });
 
-        function switchLanguage(lang) {
-            currentLang = lang;
-            document.querySelectorAll('.btn-lang').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('lang-' + lang).classList.add('active');
+        document.getElementById('custName').placeholder = langData[lang].placeholder_cust_name;
+        document.getElementById('searchBox').placeholder = langData[lang].placeholder_search;
 
-            document.querySelectorAll('[data-key]').forEach(el => {
-                let key = el.getAttribute('data-key');
-                if (langData[lang][key]) el.innerText = langData[lang][key];
-            });
+        document.getElementById('menu1').innerHTML = `${langData[lang].menu1} (30 ${langData[lang].currency})`;
+        document.getElementById('menu2').innerHTML = `${langData[lang].menu2} (40 ${langData[lang].currency})`;
+        document.getElementById('menu3').innerHTML = `${langData[lang].menu3} (50 ${langData[lang].currency})`;
+        document.getElementById('menu4').innerHTML = `${langData[lang].menu4} (40 ${langData[lang].currency})`;
+        document.getElementById('menu5').innerHTML = `${langData[lang].menu5} (30 ${langData[lang].currency})`;
+        document.getElementById('menu6').innerHTML = `${langData[lang].menu6} (30 ${langData[lang].currency})`;
+        document.getElementById('menu7').innerHTML = `${langData[lang].menu7} (40 ${langData[lang].currency})`;
+        document.getElementById('menu8').innerHTML = `${langData[lang].menu8} (10 ${langData[lang].currency})`;
 
-            document.getElementById('custName').placeholder = langData[lang].placeholder_cust_name;
-            document.getElementById('searchBox').placeholder = langData[lang].placeholder_search;
+        document.getElementById('eggOpt1').innerHTML = `🥚 ${langData[lang].egg1} (+5 ${langData[lang].currency})`;
+        document.getElementById('eggOpt2').innerHTML = `🥚 ${langData[lang].egg2} (+7 ${langData[lang].currency})`;
+        document.getElementById('eggOpt3').innerHTML = `🥚 ${langData[lang].egg3} (+15 ${langData[lang].currency})`;
+        document.getElementById('eggOpt4').innerHTML = `🥚 ${langData[lang].egg4} (+15 ${langData[lang].currency})`;
+        document.getElementById('eggOpt5').innerHTML = `🥚 ${langData[lang].egg5} (+20 ${langData[lang].currency})`;
 
-            let nameInput = document.getElementById('custName').value.trim();
-            document.getElementById('resCust').innerText = nameInput !== "" ? nameInput : langData[lang].res_customer_default;
+        updateTotal();
+        renderBookings(allBookings);
+    }
 
-            updateResultDisplay();
-            renderBookingList();
+    function selectMenu(id, price, langKey) {
+        const btn = document.getElementById('menu' + id);
+        if (selectedMenus[id]) {
+            delete selectedMenus[id];
+            btn.classList.remove('active');
+        } else {
+            selectedMenus[id] = { langKey: langKey, price: price };
+            btn.classList.add('active');
+        }
+        updateTotal();
+    }
+
+    function toggleEgg(id, price, langKey) {
+        const btn = document.getElementById('eggOpt' + id);
+        if (selectedEggs[id]) {
+            delete selectedEggs[id];
+            btn.classList.remove('active');
+        } else {
+            selectedEggs[id] = { langKey: langKey, price: price };
+            btn.classList.add('active');
+        }
+        updateTotal();
+    }
+
+    function updateTotal() {
+        let menuNamesArray = [];
+        let menuSum = 0;
+
+        for (let id in selectedMenus) {
+            menuNamesArray.push(langData[currentLang][selectedMenus[id].langKey]);
+            menuSum += selectedMenus[id].price;
         }
 
-        function selectMenu(menuId, price, keyStr) {
-            selectedMenus = {}; 
-            document.querySelectorAll('.btn-menu').forEach(btn => btn.classList.remove('active'));
-            
-            selectedMenus[menuId] = { price: price, key: keyStr };
-            document.getElementById('menu' + menuId).classList.add('active');
-            
-            calculateTotal();
+        for (let id in selectedEggs) {
+            menuNamesArray.push(langData[currentLang][selectedEggs[id].langKey]);
+            menuSum += selectedEggs[id].price;
         }
 
-        function toggleEgg(eggId, price, keyStr) {
-            if (selectedEggs[eggId]) {
-                delete selectedEggs[eggId];
-                document.getElementById('eggOpt' + eggId).classList.remove('active');
-            } else {
-                selectedEggs[eggId] = { price: price, key: keyStr };
-                document.getElementById('eggOpt' + eggId).classList.add('active');
+        totalPrice = menuSum;
+        let finalName = menuNamesArray.length > 0 ? menuNamesArray.join(" + ") : langData[currentLang].res_menu_default;
+        let cName = document.getElementById('custName').value.trim() || langData[currentLang].res_customer_default;
+
+        document.getElementById('resCust').innerText = cName;
+        document.getElementById('resName').innerText = finalName;
+        document.getElementById('resPrice').innerText = totalPrice;
+    }
+
+    document.getElementById('custName').addEventListener('input', function () {
+        let name = this.value.trim() || langData[currentLang].res_customer_default;
+        document.getElementById('resCust').innerText = name;
+    });
+
+    function getBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    async function saveDirectToSheet() {
+        if (isSubmitting) return; // ถ้ากำลังส่งข้อมูลอยู่ จะไม่ทำซ้ำอีกรอบเด็ดขาด 🔒
+
+        let name = document.getElementById('custName').value.trim();
+        let menuNamesArray = [];
+
+        for (let id in selectedMenus) {
+            menuNamesArray.push(langData[currentLang][selectedMenus[id].langKey]);
+        }
+        for (let id in selectedEggs) {
+            menuNamesArray.push(langData[currentLang][selectedEggs[id].langKey]);
+        }
+        
+        let finalMenu = menuNamesArray.join(" + ");
+        if (finalMenu === "" && document.getElementById('resName').innerText !== langData[currentLang].res_menu_default) {
+            finalMenu = document.getElementById('resName').innerText;
+        }
+
+        if (!name) {
+            alert(langData[currentLang].alert_name);
+            return;
+        }
+        if (totalPrice === 0) {
+            alert(langData[currentLang].alert_menu);
+            return;
+        }
+
+        // เริ่มต้นล็อกปุ่มและตั้งสถานะการส่งข้อมูล เพื่อกัน Double Submit
+        isSubmitting = true;
+        let btn = document.getElementById('btnSave');
+        btn.disabled = true;
+        btn.innerText = langData[currentLang].btn_saving;
+
+        let formData = new FormData();
+        formData.append("custName", name);
+        formData.append("submit_menu", finalMenu);
+        formData.append("submit_price", totalPrice);
+
+        let fileInput = document.getElementById('slipFile');
+        if (fileInput.files.length > 0) {
+            let file = fileInput.files[0];
+            try {
+                let base64Data = await getBase64(file);
+                formData.append("slipData", base64Data);
+                formData.append("slipName", file.name);
+                formData.append("slipType", file.type);
+            } catch (err) {
+                alert(langData[currentLang].alert_file_err);
+                btn.disabled = false;
+                btn.innerText = langData[currentLang].btn_save;
+                isSubmitting = false;
+                return;
             }
-            calculateTotal();
         }
 
-        function calculateTotal() {
-            totalPrice = 0;
-            for (let k in selectedMenus) totalPrice += selectedMenus[k].price;
-            for (let k in selectedEggs) totalPrice += selectedEggs[k].price;
-            
-            document.getElementById('resPrice').innerText = totalPrice;
-            updateResultDisplay();
-        }
+        fetch(scriptUrl, {
+            method: 'POST',
+            body: formData,
+            mode: 'no-cors'
+        })
+        .then(() => {
+            alert(langData[currentLang].alert_success);
+            clearForm();
+            setTimeout(fetchSheetData, 1500);
+        })
+        .catch(error => {
+            console.error(error);
+            alert(langData[currentLang].alert_error);
+        })
+        .finally(() => {
+            // ปลดล็อกให้ปุ่มสามารถใช้งานใหม่ได้เฉพาะหลังจากทำทุกอย่างเสร็จสิ้นแล้วเท่านั้น
+            btn.disabled = false;
+            btn.innerText = langData[currentLang].btn_save;
+            isSubmitting = false;
+        });
+    }
 
-        function updateResultDisplay() {
-            let menuParts = [];
-            for (let k in selectedMenus) {
-                let key = selectedMenus[k].key;
-                menuParts.push(langData[currentLang][key]);
-            }
-            
-            let eggParts = [];
-            for (let k in selectedEggs) {
-                let key = selectedEggs[k].key;
-                eggParts.push(langData[currentLang][key]);
-            }
+    function fetchSheetData() {
+        fetch(fetchUrl + "&t=" + new Date().getTime())
+        .then(response => {
+            if (!response.ok) throw new Error("Network error");
+            return response.text();
+        })
+        .then(data => {
+            allBookings = parseCSV(data);
+            renderBookings(allBookings);
+        })
+        .catch(error => {
+            console.error(error);
+        });
+    }
 
-            let finalStr = "";
-            if (menuParts.length > 0) {
-                finalStr = menuParts.join(", ");
-                if (eggParts.length > 0) {
-                    finalStr += " + " + eggParts.join(", ");
+    function parseCSV(text) {
+        let result = [];
+        try {
+            let rawData = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);/);
+            if (!rawData) return result;
+            let jsonData = JSON.parse(rawData[1]);
+            let rows = jsonData.table.rows;
+
+            for (let i = 0; i < rows.length; i++) {
+                let row = rows[i].c;
+                if (!row || !row[0]) continue;
+
+                let nameVal = row[0] ? row[0].v : "";
+                let menuVal = row[1] ? row[1].v : "";
+                let priceVal = row[2] ? row[2].v : "";
+                let imgVal = row[3] ? row[3].v : "";
+
+                if (nameVal && nameVal !== "ชื่อพนักงาน" && nameVal !== "ชื่อลูกค้า") {
+                    result.push({
+                        name: nameVal,
+                        menu: menuVal,
+                        price: priceVal,
+                        imgUrl: imgVal
+                    });
                 }
-            } else {
-                finalStr = langData[currentLang].res_menu_default;
             }
+        } catch (e) {
+            console.error(e);
+        }
+        return result.reverse();
+    }
 
-            document.getElementById('resName').innerText = finalStr;
+    function prepareCashierUpdate(name, menuText, price) {
+        clearForm(); 
+        
+        document.getElementById('custName').value = name;
+        totalPrice = parseInt(price) || 0;
+        
+        document.getElementById('resCust').innerText = name;
+        document.getElementById('resName').innerText = menuText;
+        document.getElementById('resPrice').innerText = totalPrice;
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        alert("📥 ดึงข้อมูลของคิว [" + name + "] แล้วเรียบร้อย! ปุ่มเมนูทุกปุ่มยังใช้งานได้ปกติ โปรดแนบไฟล์สลิปและกดบันทึกได้เลยครับ");
+    }
+
+    function renderBookings(bookingsList) {
+        let listSection = document.getElementById('bookingListSection');
+        listSection.innerHTML = "";
+
+        if (bookingsList.length === 0) {
+            listSection.innerHTML = `<p style='color:#999; text-align:center;'>${langData[currentLang].no_queue}</p>`;
+            return;
         }
 
-        // 🧠 ส่วนสำคัญ: ดึงเมนูอาหารประจำวัน และรายการจองที่มีอยู่แล้วมา
+        bookingsList.forEach(b => {
+            let item = document.createElement('div');
+            item.className = "booking-item";
+            let actionBtn = "";
+
+            if (b.imgUrl && b.imgUrl.toString().startsWith("http")) {
+                actionBtn = `<br><a href="${b.imgUrl}" target="_blank" style="display:inline-block; margin-top:6px; padding:4px 10px; background-color:#0288d1; color:white; border-radius:5px; text-decoration:none; font-size:12px; font-weight:bold;">${langData[currentLang].view_slip}</a>`;
+            } else {
+                let safeName = b.name.replace(/'/g, "\\'").replace(/"/g, '\\"');
+                let safeMenu = b.menu.replace(/'/g, "\\'").replace(/"/g, '\\"');
+                actionBtn = `<br><button type="button" onclick="prepareCashierUpdate('${safeName}', '${safeMenu}', '${b.price}')" style="display:inline-block; margin-top:6px; padding:4px 10px; background-color:#e65100; color:white; border:none; border-radius:5px; cursor:pointer; font-size:12px; font-weight:bold;">${langData[currentLang].update_slip_btn}</button>`;
+            }
+
+            item.innerHTML = `
+                <div class="booking-details">
+                    <b>👤 ${b.name}</b>
+                    ${actionBtn}
+                    <br>
+                    <small style="color:#666;">${b.menu}</small>
+                </div>
+                <div class="booking-price">
+                    ${b.price ? b.price + ' ' + langData[currentLang].currency : ''}
+                </div>
+            `;
+            listSection.appendChild(item);
+        });
+    }
+
+    function filterBookings() {
+        let searchKeyword = document.getElementById('searchBox').value.toLowerCase().trim();
+        if (searchKeyword === "") {
+            renderBookings(allBookings);
+            return;
+        }
+        let filtered = allBookings.filter(b => b.name.toLowerCase().includes(searchKeyword));
+        renderBookings(filtered);
+    }
+
+    function clearForm() {
+        document.getElementById('custName').value = "";
+        document.getElementById('slipFile').value = "";
+
+        selectedMenus = {};
+        selectedEggs = {};
+        totalPrice = 0;
+
+        for (let i = 1; i <= 8; i++) {
+            let menuBtn = document.getElementById('menu' + i);
+            if (menuBtn) menuBtn.classList.remove('active');
+        }
+        for (let i = 1; i <= 5; i++) {
+            let eggBtn = document.getElementById('eggOpt' + i);
+            if (eggBtn) eggBtn.classList.remove('active');
+        }
+        updateTotal();
+    }
+
+    /* =======================================================
+        🔒 2. โค้ด JavaScript สำหรับบล็อกการคลิกขวาและบล็อกคีย์ลัด 
+       ======================================================= */
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        alert(langData[currentLang].alert_context);
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === "F12" || e.keyCode === 123) {
+            e.preventDefault();
+            return false;
+        }
+        if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C' || e.key === 'i' || e.key === 'j' || e.key === 'c')) {
+            e.preventDefault();
+            return false;
+        }
+        if (e.ctrlKey && (e.key === 'u' || e.key === 'U')) {
+            e.preventDefault();
+            return false;
+        }
+        if (e.ctrlKey && (e.key === 's' || e.key === 'S')) {
+            e.preventDefault();
+            return false;
+        }
+        if (e.ctrlKey && (e.key === 'c' || e.key === 'C')) {
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    /* =======================================================
+        📢 3. โค้ดสำหรับดึงข้อมูลการแจ้งเตือนจากชีท Announce (config)
+       ======================================================= */
+    async function fetchAnnouncement() {
+        const fileId = "1US69UZxdU7NTyP2y0nYmebshzbUIYfiO6V7NlJRI4EI"; 
+        const configUrl = `https://docs.google.com/spreadsheets/d/${fileId}/gviz/tq?sheet=config`;
+        
+        try {
+            let response = await fetch(configUrl + "&t=" + new Date().getTime());
+            let text = await response.text();
+            let rawData = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);/);
+            if (!rawData) return;
+            
+            let jsonData = JSON.parse(rawData[1]);
+            if (!jsonData.table || !jsonData.table.rows) return;
+            
+            jsonData.table.rows.forEach(row => {
+                if (!row.c) return;
+                let key = row.c[0] ? row.c[0].v : "";
+                let val = row.c[1] ? row.c[1].v : "";
+                
+                if (key === "announcement") {
+                    let bar = document.getElementById('announcement-bar');
+                    let textEl = document.getElementById('announcement-text');
+                    
+                    if (val && val.toString().trim() !== "") {
+                        textEl.innerText = val;
+                        bar.style.display = "block";
+                    } else {
+                        bar.style.display = "none";
+                    }
+                }
+            });
+        } catch (e) {
+            console.error("ดึงข้อมูลจากไฟล์ Announce ไม่ได้:", e);
+        }
+    }
+
+    setInterval(fetchAnnouncement, 10000);
+    fetchAnnouncement();
+
+</script>
+</body>
+</html>
