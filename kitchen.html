@@ -5,18 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>หน้าจอคนครัว - ร้านริมขอบฟ้า</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #121212; color: #ffffff; margin: 0; padding: 20px; }
-        h2 { text-align: center; color: #ff9800; margin-bottom: 20px; }
+        body { font-family: sans-serif; background-color: #121212; color: #fff; padding: 20px; }
         .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-        .order-card { background-color: #1e1e1e; border-left: 8px solid #ff9800; border-radius: 8px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .emp-name { font-size: 20px; font-weight: bold; color: #fff; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 5px; }
-        .menu-details { font-size: 16px; color: #e0e0e0; margin-bottom: 15px; }
-        .btn-done { background-color: #4caf50; color: white; border: none; padding: 12px; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; width: 100%; }
-        .btn-done:disabled { background-color: #555; cursor: not-allowed; }
+        .order-card { background-color: #1e1e1e; border-left: 8px solid #ff9800; border-radius: 8px; padding: 15px; }
+        .btn-done { background-color: #4caf50; color: white; border: none; padding: 12px; width: 100%; cursor: pointer; border-radius: 5px; }
     </style>
 </head>
 <body>
-
     <h2>👨‍🍳 รายการคิวอาหารที่ต้องตัก</h2>
     <div class="grid-container" id="kitchenGrid">กำลังโหลดข้อมูล...</div>
 
@@ -25,82 +20,45 @@
         const SS_ID = "1sZB3Mx32-Vmx81EZQlnWQ4XByVhWnOdyaZPHQxjhQzU";
 
         async function fetchKitchenOrders() {
-    // เพิ่ม cachebust เพื่อบังคับให้ดึงข้อมูลใหม่ล่าสุดเสมอ
-    const url = `https://docs.google.com/spreadsheets/d/${SS_ID}/gviz/tq?sheet=inventory&t=${new Date().getTime()}&cachebust=${Math.random()}`;
-    
-    try {
-        let response = await fetch(url);
-        let text = await response.text();
-        let rawData = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);/);
-        if (!rawData) return;
-        
-        let jsonData = JSON.parse(rawData[1]);
-        let rows = jsonData.table.rows;
-        let grid = document.getElementById('kitchenGrid');
-        grid.innerHTML = "";
-        
-        let found = false;
-        for (let i = 1; i < rows.length; i++) {
-            let row = rows[i];
-            if (!row.c || !row.c[0]) continue;
-            
-            let name = row.c[0]?.v || "";
-            let food = row.c[1]?.v || "";
-            // ยืนยันว่าอ่านคอลัมน์ที่ 5 (index 4) ถูกต้อง
-            let status = row.c[4]?.v?.toString().trim() || ""; 
-
-            // ตรวจสอบสถานะให้ชัวร์ว่าต้องเป็น "รอตัก" เท่านั้น
-            if (status === "รอตัก") {
-                found = true;
-                let card = document.createElement('div');
-                card.className = "order-card";
-                card.id = "row-" + (i + 1);
-                card.innerHTML = `
-                    <div>
-                        <div class="emp-name">${name}</div>
-                        <div class="menu-details">${food}</div>
-                    </div>
-                    <button class="btn-done" onclick="markAsDone(${i + 1}, this)">✅ ตักสำเร็จ</button>
-                `;
-                grid.appendChild(card);
-            }
+            const url = `https://docs.google.com/spreadsheets/d/${SS_ID}/gviz/tq?sheet=inventory&t=${new Date().getTime()}`;
+            try {
+                let response = await fetch(url);
+                let text = await response.text();
+                let json = JSON.parse(text.substring(47, text.length - 2));
+                let grid = document.getElementById('kitchenGrid');
+                grid.innerHTML = "";
+                
+                let found = false;
+                json.table.rows.forEach((row, i) => {
+                    if (row.c[4]?.v === "รอตัก") {
+                        found = true;
+                        let card = document.createElement('div');
+                        card.className = "order-card";
+                        card.id = "row-" + (i + 1);
+                        card.innerHTML = `<div>${row.c[0]?.v}</div><div style="margin-bottom:10px">${row.c[1]?.v}</div>
+                                          <button class="btn-done" onclick="markAsDone(${i + 1}, this)">✅ ตักสำเร็จ</button>`;
+                        grid.appendChild(card);
+                    }
+                });
+                if (!found) grid.innerHTML = "<div style='grid-column:1/-1; text-align:center;'>🎉 ตักครบหมดแล้ว!</div>";
+            } catch (e) { document.getElementById('kitchenGrid').innerHTML = "เกิดข้อผิดพลาดในการโหลด"; }
         }
-        if (!found) grid.innerHTML = "<div style='grid-column:1/-1; text-align:center;'>🎉 ตักครบหมดแล้ว!</div>";
-    } catch (e) { console.error("ดึงข้อมูลพลาด:", e); }
-}
 
         async function markAsDone(rowIndex, btn) {
-    btn.disabled = true;
-    btn.innerText = "⏳ กำลังบันทึก...";
-
-    // ส่งผ่าน URL QueryString ตรงๆ ไปเลย (ชัวร์ที่สุดสำหรับ Apps Script)
-    const url = `${WEB_APP_URL}?action=update_status&row_index=${rowIndex}`;
-
-    try {
-        const response = await fetch(url, { method: "POST" });
-        const result = await response.json();
-        
-        if (result.status === "success") {
-            document.getElementById("row-" + rowIndex).remove();
-        } else {
-            throw new Error("Update failed");
+            btn.disabled = true;
+            btn.innerText = "⏳ กำลังบันทึก...";
+            try {
+                // ส่งค่าผ่าน URL แบบ QueryString
+                await fetch(`${WEB_APP_URL}?action=update_status&row_index=${rowIndex}`, { method: "POST" });
+                document.getElementById("row-" + rowIndex).remove();
+            } catch (e) {
+                alert("ส่งข้อมูลพลาด! ลองอีกครั้ง");
+                btn.disabled = false;
+                btn.innerText = "✅ ตักสำเร็จ";
+            }
         }
-    } catch (e) { 
-        alert("ส่งข้อมูลไม่สำเร็จ! กรุณารีเฟรชหน้าจอ");
-        btn.disabled = false;
-        btn.innerText = "✅ ตักสำเร็จ";
-    }
-}
-        // ลบแถวทิ้งทันทีเมื่อส่งสำเร็จ
-        document.getElementById("row-" + rowIndex).remove();
-    } catch (e) {
-        alert("เชื่อมต่อไม่ได้! ลองใหม่อีกครั้ง");
-        btn.disabled = false;
-        btn.innerText = "✅ ตักสำเร็จ";
-    }
-}
-
-        window.onload = () => { fetchKitchenOrders(); setInterval(fetchKitchenOrders, 5000); };
+        window.onload = fetchKitchenOrders;
+        setInterval(fetchKitchenOrders, 5000);
     </script>
 </body>
 </html>
