@@ -73,17 +73,24 @@
     btn.disabled = true;
     btn.innerText = "⏳ กำลังบันทึก...";
 
+    // ส่งผ่าน URL QueryString ตรงๆ ไปเลย (ชัวร์ที่สุดสำหรับ Apps Script)
+    const url = `${WEB_APP_URL}?action=update_status&row_index=${rowIndex}`;
+
     try {
-        // ใช้ URLSearchParams แทน FormData เพื่อความเสถียร
-        const params = new URLSearchParams();
-        params.append('action', 'update_status');
-        params.append('row_index', rowIndex);
-
-        const response = await fetch(WEB_APP_URL, {
-            method: "POST",
-            body: params
-        });
-
+        const response = await fetch(url, { method: "POST" });
+        const result = await response.json();
+        
+        if (result.status === "success") {
+            document.getElementById("row-" + rowIndex).remove();
+        } else {
+            throw new Error("Update failed");
+        }
+    } catch (e) { 
+        alert("ส่งข้อมูลไม่สำเร็จ! กรุณารีเฟรชหน้าจอ");
+        btn.disabled = false;
+        btn.innerText = "✅ ตักสำเร็จ";
+    }
+}
         // ลบแถวทิ้งทันทีเมื่อส่งสำเร็จ
         document.getElementById("row-" + rowIndex).remove();
     } catch (e) {
