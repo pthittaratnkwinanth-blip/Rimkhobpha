@@ -29,41 +29,34 @@
                 grid.innerHTML = "";
                 
                 let found = false;
-                json.table.rows.forEach((row, i) => {
+                json.table.rows.forEach((row) => {
                     if (row.c[4]?.v === "รอตัก") {
                         found = true;
+                        let name = row.c[0]?.v;
                         let card = document.createElement('div');
                         card.className = "order-card";
-                        card.id = "row-" + (i + 1);
-                        card.innerHTML = `<div>${row.c[0]?.v}</div><div style="margin-bottom:10px">${row.c[1]?.v}</div>
-                                          <button class="btn-done" onclick="markAsDone(${i + 1}, this)">✅ ตักสำเร็จ</button>`;
+                        card.innerHTML = `<div>${name}</div><div style="margin-bottom:10px">${row.c[1]?.v}</div>
+                                          <button class="btn-done" onclick="markAsDone('${name}', this)">✅ ตักสำเร็จ</button>`;
                         grid.appendChild(card);
                     }
                 });
                 if (!found) grid.innerHTML = "<div style='grid-column:1/-1; text-align:center;'>🎉 ตักครบหมดแล้ว!</div>";
             } catch (e) { document.getElementById('kitchenGrid').innerHTML = "เกิดข้อผิดพลาดในการโหลด"; }
         }
-// ในฟังก์ชัน fetchKitchenOrders ตอนสร้างปุ่ม ให้เปลี่ยนเป็น:
-// onclick="markAsDone('${name}', this)"
 
-async function markAsDone(empName, btn) {
-    btn.disabled = true;
-    btn.innerText = "⏳ กำลังบันทึก...";
-    
-    // ส่งชื่อไปอัปเดต
-    const url = `${WEB_APP_URL}?action=update_status&name=${encodeURIComponent(empName)}`;
-    
-    try {
-        await fetch(url, { method: "POST" });
-        // หายไปจากหน้าจอ
-        btn.parentElement.remove(); 
-    } catch (e) {
-        alert("พลาด!");
-        btn.disabled = false;
-        btn.innerText = "✅ ตักสำเร็จ";
-    }
-}
-
+        async function markAsDone(empName, btn) {
+            btn.disabled = true;
+            btn.innerText = "⏳ กำลังบันทึก...";
+            try {
+                // ส่งชื่อไปอัปเดต (ตรวจสอบให้แน่ใจว่า Apps Script รับค่า name ได้)
+                await fetch(`${WEB_APP_URL}?action=update_status&name=${encodeURIComponent(empName)}`, { method: "POST" });
+                btn.parentElement.parentElement.remove(); // ลบทั้งการ์ดออก
+            } catch (e) {
+                alert("พลาด!");
+                btn.disabled = false;
+                btn.innerText = "✅ ตักสำเร็จ";
+            }
+        }
         window.onload = fetchKitchenOrders;
         setInterval(fetchKitchenOrders, 5000);
     </script>
