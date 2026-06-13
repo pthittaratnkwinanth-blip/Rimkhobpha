@@ -5,174 +5,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>หน้าจอคนครัว - ร้านริมขอบฟ้า</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #121212;
-            color: #ffffff;
-            margin: 0;
-            padding: 20px;
-        }
-        h2 {
-            text-align: center;
-            color: #ff9800;
-            margin-bottom: 20px;
-        }
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-        }
-        .order-card {
-            background-color: #1e1e1e;
-            border-left: 8px solid #ff9800;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        .emp-name {
-            font-size: 20px;
-            font-weight: bold;
-            color: #fff;
-            margin-bottom: 10px;
-            border-bottom: 1px solid #333;
-            padding-bottom: 5px;
-        }
-        .menu-details {
-            font-size: 16px;
-            color: #e0e0e0;
-            margin-bottom: 15px;
-            line-height: 1.4;
-        }
-        .btn-done {
-            background-color: #4caf50;
-            color: white;
-            border: none;
-            padding: 12px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: 0.2s;
-            width: 100%;
-        }
-        .btn-done:hover {
-            background-color: #45a049;
-        }
-        .loading {
-            text-align: center;
-            font-size: 18px;
-            color: #aaa;
-        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #121212; color: #ffffff; margin: 0; padding: 20px; }
+        h2 { text-align: center; color: #ff9800; margin-bottom: 20px; }
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .order-card { background-color: #1e1e1e; border-left: 8px solid #ff9800; border-radius: 8px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.2s; }
+        .emp-name { font-size: 20px; font-weight: bold; color: #fff; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        .menu-details { font-size: 16px; color: #e0e0e0; margin-bottom: 15px; }
+        .btn-done { background-color: #4caf50; color: white; border: none; padding: 12px; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; width: 100%; }
+        .btn-done:disabled { background-color: #555; cursor: not-allowed; }
     </style>
 </head>
 <body>
 
     <h2>👨‍🍳 รายการคิวอาหารที่ต้องตัก</h2>
-    <div class="loading" id="loadingText">กำลังโหลดคิวอาหารสดจากห้องครัว...</div>
-    <div class="grid-container" id="kitchenGrid"></div>
+    <div class="grid-container" id="kitchenGrid">กำลังโหลดข้อมูล...</div>
 
     <script>
-        // ลิงก์เว็บแอปจาก Google Apps Script ของสั่งอาหารพนักงาน
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyzpxoVFs48gulO5NAw1kyir1s5SILdCyX1Qf0gZ-1RoV8iTAoZdGPKk-ZGWeymz72JEA/exec"; 
-        
-        // ไอดี Google Sheets สั่งอาหารพนักงาน
         const SS_ID = "1sZB3Mx32-Vmx81EZQlnWQ4XByVhWnOdyaZPHQxjhQzU";
 
         async function fetchKitchenOrders() {
-            // 🎯 แก้ไขจุดนี้: เปลี่ยนโครงสร้างลิงก์ให้เชื่อมต่อกับคิวภายนอกผ่าน gviz/tq ให้ถูกต้อง
-            const url = `https://docs.google.com/spreadsheets/d/${SS_ID}/gviz/tq?sheet=inventory`;
+            // ใส่ nocache เพื่อบังคับให้ดึงข้อมูลใหม่เสมอ
+            const url = `https://docs.google.com/spreadsheets/d/${SS_ID}/gviz/tq?sheet=inventory&t=${new Date().getTime()}&nocache=${Math.random()}`;
             
             try {
-                let response = await fetch(url + "&t=" + new Date().getTime());
+                let response = await fetch(url);
                 let text = await response.text();
                 let rawData = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);/);
                 if (!rawData) return;
                 
                 let jsonData = JSON.parse(rawData[1]);
-                if (!jsonData.table || !jsonData.table.rows) return;
-                
+                let rows = jsonData.table.rows;
                 let grid = document.getElementById('kitchenGrid');
-                document.getElementById('loadingText').style.display = "none";
                 grid.innerHTML = "";
                 
-                let rows = jsonData.table.rows;
-                let count = 0;
+                let found = false;
+                for (let i = 1; i < rows.length; i++) {
+                    let row = rows[i];
+                    if (!row.c || !row.c[0]) continue;
+                    
+                    let name = row.c[0]?.v || "";
+                    let food = row.c[1]?.v || "";
+                    let status = row.c[4]?.v?.toString().trim() || ""; 
 
-                // วนลูปอ่านข้อมูลทุกแถวเพื่อหาเฉพาะรายการที่ "รอตัก"
-                // เปลี่ยนลูป for ในไฟล์ kitchen.html ให้เป็นชุดนี้ครับ
-// วนลูปอ่านข้อมูล แต่จำกัดให้แสดงผลแค่ 100 แถวแรกเท่านั้น
-let limit = Math.min(rows.length, 101); // 101 เพราะแถวที่ 1 คือหัวตาราง
-for (let i = 1; i < limit; i++) {
-    let row = rows[i];
-    if (!row.c || !row.c[0]) continue;
-    
-    let name = row.c[0] ? row.c[0].v : "";
-    let food = row.c[1] ? row.c[1].v : "";
-    let status = row.c[4] ? row.c[4].v.toString().trim() : ""; 
-    let rowIndex = i + 1; 
-
-    // กรองให้แสดงเฉพาะแถวที่เป็นคำว่า "รอตัก"
-    if (status === "รอตัก") {
-        count++;
-        let card = document.createElement('div');
-        card.className = "order-card";
-        card.innerHTML = `
-            <div>
-                <div class="emp-name">${name}</div>
-                <div class="menu-details">${food}</div>
-            </div>
-            <button class="btn-done" onclick="markAsDone(${rowIndex}, this)">✅ ตักสำเร็จ</button>
-        `;
-        grid.appendChild(card);
-    }
-}
-                if (count === 0) {
-                    grid.innerHTML = "<div style='grid-column:1/-1; text-align:center; color:#888;'>🎉 ตักครบหมดทุกคิวแล้วครับ!</div>";
+                    if (status === "รอตัก") {
+                        found = true;
+                        let card = document.createElement('div');
+                        card.className = "order-card";
+                        card.id = "row-" + (i + 1);
+                        card.innerHTML = `
+                            <div>
+                                <div class="emp-name">${name}</div>
+                                <div class="menu-details">${food}</div>
+                            </div>
+                            <button class="btn-done" onclick="markAsDone(${i + 1}, this)">✅ ตักสำเร็จ</button>
+                        `;
+                        grid.appendChild(card);
+                    }
                 }
-            } catch (e) {
-                console.error("โหลดคิวห้องครัวผิดพลาด:", e);
-            }
+                if (!found) grid.innerHTML = "<div style='grid-column:1/-1; text-align:center;'>🎉 ตักครบหมดแล้ว!</div>";
+            } catch (e) { console.error(e); }
         }
 
-        async function markAsDone(rowIndex, button) {
-            if (!confirm("ยืนยันว่าตักอาหารรายการนี้เสร็จแล้วใช่ไหมครับ?")) return;
+        async function markAsDone(rowIndex, btn) {
+            btn.disabled = true;
+            btn.innerText = "⏳ กำลังบันทึก...";
             
-            button.disabled = true;
-            button.innerText = "⏳ กำลังบันทึก...";
+            // ลบคาร์ดออกทันทีจากหน้าจอเพื่อความรวดเร็ว
+            document.getElementById("row-" + rowIndex).style.display = "none";
 
             let formData = new FormData();
             formData.append("action", "update_status");
             formData.append("row_index", rowIndex);
 
             try {
-                let response = await fetch(WEB_APP_URL, {
-                    method: "POST",
-                    body: formData
-                });
-                let result = await response.json();
-                if (result.status === "success") {
-                    fetchKitchenOrders(); // โหลดข้อมูลใหม่เพื่อลบคาร์ดที่ทำเสร็จแล้วออก
-                } else {
-                    alert("เกิดข้อผิดพลาด กรุณาลองใหม่");
-                    button.disabled = false;
-                    button.innerText = "✅ ตักสำเร็จ";
-                }
-            } catch (error) {
-                console.error(error);
-                alert("เชื่อมต่อหลังบ้านไม่ได้ กรุณาลองใหม่");
-                button.disabled = false;
-                button.innerText = "✅ ตักสำเร็จ";
+                await fetch(WEB_APP_URL, { method: "POST", body: formData });
+            } catch (e) { 
+                alert("พลาด! กรุณารีเฟรช"); 
+                document.getElementById("row-" + rowIndex).style.display = "block";
             }
         }
 
-        // โหลดข้อมูลครั้งแรก และตั้งให้รีเฟรชออโต้ทุกๆ 8 วินาที
-        window.onload = function() {
-            fetchKitchenOrders();
-            setInterval(fetchKitchenOrders, 8000);
-        };
+        window.onload = () => { fetchKitchenOrders(); setInterval(fetchKitchenOrders, 5000); };
     </script>
 </body>
 </html>
