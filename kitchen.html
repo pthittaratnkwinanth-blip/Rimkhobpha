@@ -4,10 +4,60 @@
     <meta charset="UTF-8">
     <title>หน้าจอคนครัว</title>
     <style>
-        body { background-color: #121212; color: #fff; padding: 20px; font-family: sans-serif; }
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-        .order-card { background-color: #1e1e1e; border-left: 8px solid #ff9800; padding: 15px; border-radius: 8px; }
-        .btn-done { background-color: #4caf50; color: white; border: none; padding: 12px; width: 100%; cursor: pointer; border-radius: 5px; }
+        /* ตั้งค่าพื้นหลัง */
+        body { 
+            background-image: url('backgroud kitchen.png'); 
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            color: #fff; 
+            padding: 20px; 
+            font-family: 'Kanit', sans-serif; 
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        h2 { 
+            text-align: center; 
+            background: rgba(0,0,0,0.4); 
+            padding: 15px; 
+            border-radius: 15px; 
+            backdrop-filter: blur(5px);
+            width: fit-content;
+            margin: 0 auto 20px auto;
+        }
+
+        .grid-container { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 20px; 
+        }
+
+        /* ปรับการ์ดรายการให้เข้ากับพื้นหลัง */
+        .order-card { 
+            background-color: rgba(255, 255, 255, 0.15); 
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 20px; 
+            border-radius: 15px; 
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-done { 
+            background-color: #d4af37; 
+            color: #000; 
+            font-weight: bold;
+            border: none; 
+            padding: 12px; 
+            width: 100%; 
+            cursor: pointer; 
+            border-radius: 8px; 
+            margin-top: 15px;
+            transition: 0.3s;
+        }
+
+        .btn-done:hover { background-color: #f1c40f; }
     </style>
 </head>
 <body>
@@ -15,7 +65,6 @@
     <div class="grid-container" id="kitchenGrid">กำลังโหลดข้อมูล...</div>
 
     <script>
-        // เปลี่ยนลิงก์นี้ให้เป็นลิงก์ Web App ล่าสุดของพี่
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwGlyJAtLM8ysmE39mW-SpSsst3IH9L7uPpLE3eK-JY9BY7jGRDxfFpXn0t3YuTXCXS-Q/exec";
         const SS_URL = "https://docs.google.com/spreadsheets/d/1sZB3Mx32-Vmx81EZQlnWQ4XByVhWnOdyaZPHQxjhQzU/gviz/tq?tqx=out:json&sheet=inventory";
 
@@ -23,35 +72,34 @@
             try {
                 let res = await fetch(SS_URL);
                 let text = await res.text();
-                // ล้างข้อมูลส่วนเกินของ JSON จาก Google
                 let json = JSON.parse(text.substring(47, text.length - 2));
                 let grid = document.getElementById('kitchenGrid');
                 grid.innerHTML = "";
                 
                 json.table.rows.forEach(row => {
-                    let name = row.c[0]?.v; // ชื่อพนักงาน
-                    let food = row.c[1]?.v; // รายการสั่ง
-                    let status = row.c[4]?.v; // สถานะ (คอลัมน์ที่ 5)
+                    let name = row.c[0]?.v;
+                    let food = row.c[1]?.v;
+                    let status = row.c[4]?.v;
 
                     if (status === "รอตัก" && name) {
                         let div = document.createElement('div');
                         div.className = "order-card";
-                        div.innerHTML = `<div><b>${name}</b></div><div>${food}</div><br>
+                        div.innerHTML = `<div><b>ชื่อ:</b> ${name}</div><div><b>เมนู:</b> ${food}</div>
                                          <button class="btn-done" onclick="updateStatus('${name}', this)">✅ ตักสำเร็จ</button>`;
                         grid.appendChild(div);
                     }
                 });
             } catch(e) { 
-                document.getElementById('kitchenGrid').innerHTML = "โหลดข้อมูลไม่สำเร็จ (ตรวจสอบว่าแชร์ Sheet เป็นสาธารณะแล้ว)"; 
+                document.getElementById('kitchenGrid').innerHTML = "โหลดข้อมูลไม่สำเร็จ"; 
             }
         }
 
         async function updateStatus(name, btn) {
             btn.innerText = "⏳ กำลังบันทึก...";
             try {
-                let res = await fetch(`${WEB_APP_URL}?action=update_status&name=${encodeURIComponent(name)}`, { method: "POST" });
-                btn.parentElement.remove(); // ลบการ์ดออกทันทีที่อัปเดตสำเร็จ
-            } catch(e) { alert("พลาด! ตรวจสอบสิทธิ์ Apps Script"); btn.innerText = "✅ ตักสำเร็จ"; }
+                await fetch(`${WEB_APP_URL}?action=update_status&name=${encodeURIComponent(name)}`, { method: "POST" });
+                btn.parentElement.remove();
+            } catch(e) { alert("เกิดข้อผิดพลาด"); btn.innerText = "✅ ตักสำเร็จ"; }
         }
         
         loadOrders();
