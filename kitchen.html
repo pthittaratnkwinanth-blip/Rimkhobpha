@@ -2,17 +2,15 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>หน้าจอคนครัว</title>
     <style>
-        /* ตั้งค่าพื้นหลังแบบครอบคลุมและบังคับให้แสดงผล */
+        /* ตั้งค่าพื้นหลัง */
         body { 
-            background-image: url('bg.png') !important; 
-            background-size: cover !important;
-            background-position: center center !important;
-            background-attachment: fixed !important;
-            background-repeat: no-repeat !important;
-            background-color: #2c3e50; /* สีสำรองถ้าโหลดภาพไม่ขึ้น */
+            background-image: url('backgroud kitchen.png'); 
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
             color: #fff; 
             padding: 20px; 
             font-family: 'Kanit', sans-serif; 
@@ -22,31 +20,30 @@
 
         h2 { 
             text-align: center; 
-            background: rgba(0,0,0,0.5); 
+            background: rgba(0,0,0,0.4); 
             padding: 15px; 
             border-radius: 15px; 
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(5px);
             width: fit-content;
             margin: 0 auto 20px auto;
-            border: 1px solid rgba(255,255,255,0.1);
         }
 
         .grid-container { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
             gap: 20px; 
-            max-width: 1200px;
-            margin: 0 auto;
         }
 
+        /* ปรับการ์ดรายการให้เป็นสีพื้นหลังขาวโปร่งแสง และตัวอักษรสีดำ */
         .order-card { 
-            background-color: rgba(255, 255, 255, 0.15); 
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background-color: rgba(255, 255, 255, 0.7); /* เพิ่มความทึบแสงเพื่อให้สีดำเด่นขึ้น */
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
             padding: 20px; 
             border-radius: 15px; 
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
-            color: #ffffff;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            color: #000000; /* เปลี่ยนสีตัวอักษรเป็นสีดำ */
+            font-weight: 500;
         }
 
         .btn-done { 
