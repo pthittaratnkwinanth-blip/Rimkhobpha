@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ร้านข้าวราดแกงริมขอบฟ้า v5.4 (Fixed Double Submit)</title>
+    <title>ร้านข้าวราดแกงริมขอบฟ้า v5.6 (Multi-Select & Sheets)</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,209 +21,41 @@
             position: relative;
             min-height: 100vh;
             overflow-x: hidden;
-            -webkit-user-select: none;  /* สำหรับ Safari */
-            -moz-user-select: none;     /* สำหรับ Firefox */
-            -ms-user-select: none;      /* สำหรับ IE/Edge */
-            user-select: none;          /* สำหรับ Chrome และเบราว์เซอร์มาตรฐาน */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
-        /* 🌐 ส่วนของปุ่มสลับภาษาด้านบน */
-        .lang-switcher {
-            margin-bottom: 15px;
-            display: flex;
-            gap: 10px;
-        }
-        .btn-lang {
-            padding: 6px 12px;
-            font-size: 14px;
-            border: 1px solid #ccc;
-            border-radius: 20px;
-            background: white;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.2s;
-        }
-        .btn-lang.active {
-            background-color: #333;
-            color: white;
-            border-color: #333;
-        }
+        .lang-switcher { margin-bottom: 15px; display: flex; gap: 10px; }
+        .btn-lang { padding: 6px 12px; font-size: 14px; border: 1px solid #ccc; border-radius: 20px; background: white; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-lang.active { background-color: #333; color: white; border-color: #333; }
+        .corner-logo { position: fixed; bottom: 15px; right: 15px; width: 220px; opacity: 0.95; z-index: 999; pointer-events: none; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.2)); }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 450px; text-align: center; margin-bottom: 20px; position: relative; z-index: 1; }
+        h2 { color: #d9534f; margin-bottom: 10px; margin-top: 5px; }
+        h3 { color: #333; margin-top: 10px; text-align: left; }
+        
+        /* ปรับแต่งปุ่มให้เวลากดแล้วดูสมูทขึ้น */
+        .btn { width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; transition: transform 0.1s, background-color 0.2s; font-weight: bold; }
+        .btn:active { transform: scale(0.98); }
+        .btn-menu { background-color: #f0f0f0; color: #333; border: 1px solid #ccc; }
+        .btn-option { background-color: #e0f7fa; color: #006064; border: 1px solid #b2ebf2; }
+        .btn-success { background-color: #0288d1; color: white; margin-top: 15px; }
+        .btn-success:disabled { background-color: #ccc; cursor: not-allowed; }
+        .btn-clear { background-color: #eeeeee; color: #333; border: 1px solid #ccc; }
 
-        /* ✅ โลโก้มุมขวาล่าง */
-        .corner-logo {
-            position: fixed;
-            bottom: 15px;
-            right: 15px;
-            width: 220px;
-            opacity: 0.95;
-            z-index: 999;
-            pointer-events: none;
-            filter: drop-shadow(0 3px 6px rgba(0,0,0,0.2));
-        }
+        .result-box { background: #fff8e1; border: 1px solid #ffe082; padding: 15px; border-radius: 8px; margin: 15px 0; text-align: left; }
+        input[type="text"], input[type="file"] { width: 92%; padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 8px; text-align: center; margin-top: 5px; margin-bottom: 10px; }
+        input[type="file"] { background: #fff; cursor: pointer; width: 87%; }
+        .total { font-size: 20px; font-weight: bold; color: #d9534f; text-align: center; margin-top: 5px; }
+        .booking-list { text-align: left; background: #fafafa; border: 1px solid #ddd; padding: 10px; border-radius: 8px; max-height: 250px; overflow-y: auto; }
+        .booking-item { padding: 10px; border-bottom: 1px solid #eee; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
+        .booking-details { text-align: left; }
+        .booking-price { font-weight: bold; color: #d9534f; white-space: nowrap; }
+        .admin-warning { color: #0288d1; font-size: 13px; font-weight: bold; margin: -5px 0 10px 0; text-align: center; background-color: #e1f5fe; padding: 5px; border-radius: 5px; }
+        .bank-box { background: #e8f5e9; border: 1px solid #a5d6a7; padding: 12px; border-radius: 8px; margin-bottom: 15px; text-align: left; font-size: 14px; color: #2e7d32; }
 
-        .card {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 450px;
-            text-align: center;
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 1;
-        }
-
-        h2 {
-            color: #d9534f;
-            margin-bottom: 10px;
-            margin-top: 5px;
-        }
-
-        h3 {
-            color: #333;
-            margin-top: 10px;
-            text-align: left;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 12px;
-            margin: 8px 0;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: 0.2s;
-            font-weight: bold;
-        }
-
-        .btn-menu {
-            background-color: #f0f0f0;
-            color: #333;
-            border: 1px solid #ccc;
-        }
-
-        .btn-menu.active {
-            background-color: #d9534f;
-            color: white;
-            border-color: #d9534f;
-        }
-
-        .btn-option {
-            background-color: #e0f7fa;
-            color: #006064;
-        }
-
-        .btn-option.active {
-            background-color: #00838f;
-            color: white;
-        }
-
-        .btn-success {
-            background-color: #0288d1;
-            color: white;
-            margin-top: 15px;
-        }
-
-        .btn-success:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-
-        .result-box {
-            background: #fff8e1;
-            border: 1px solid #ffe082;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            text-align: left;
-        }
-
-        input[type="text"],
-        input[type="file"] {
-            width: 92%;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            text-align: center;
-            margin-top: 5px;
-            margin-bottom: 10px;
-        }
-
-        input[type="file"] {
-            background: #fff;
-            cursor: pointer;
-            width: 87%;
-        }
-
-        .total {
-            font-size: 20px;
-            font-weight: bold;
-            color: #d9534f;
-            text-align: center;
-            margin-top: 5px;
-        }
-
-        .booking-list {
-            text-align: left;
-            background: #fafafa;
-            border: 1px solid #ddd;
-            padding: 10px;
-            border-radius: 8px;
-            max-height: 250px;
-            overflow-y: auto;
-        }
-
-        .booking-item {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            font-size: 14px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .booking-details {
-            text-align: left;
-        }
-
-        .booking-price {
-            font-weight: bold;
-            color: #d9534f;
-            white-space: nowrap;
-        }
-
-        .admin-warning {
-            color: #0288d1;
-            font-size: 13px;
-            font-weight: bold;
-            margin: -5px 0 10px 0;
-            text-align: center;
-            background-color: #e1f5fe;
-            padding: 5px;
-            border-radius: 5px;
-        }
-
-        .bank-box {
-            background: #e8f5e9;
-            border: 1px solid #a5d6a7;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            text-align: left;
-            font-size: 14px;
-            color: #2e7d32;
-        }
-
-        @media (max-width: 768px) {
-            .corner-logo {
-                width: 80px;
-                bottom: 10px;
-                right: 10px;
-            }
-        }
+        @media (max-width: 768px) { .corner-logo { width: 80px; bottom: 10px; right: 10px; } }
     </style>
 </head>
 
@@ -255,23 +87,24 @@
 
         <div style="text-align: left; background: #f9f9f9; padding: 10px; border-radius: 8px; margin-bottom: 15px;">
             <label>👤 <b data-key="label_cust_name">ชื่อลูกค้า หรือ รหัสการจอง:</b></label>
-            <input type="text" id="custName" placeholder="เช่น คนสวย / เมนูที่1 / เมนูที่2">
+            <input type="text" id="custName" placeholder="เช่น คนสวย / โต๊ะ 5 / บอส01">
         </div>
 
-        <button type="button" class="btn btn-menu" id="menu1" onclick="selectMenu(1, 30, 'menu1')">ราดข้าว 1 อย่าง (30 บาท)</button>
-        <button type="button" class="btn btn-menu" id="menu2" onclick="selectMenu(2, 40, 'menu2')">ราดข้าว 2 อย่าง (40 บาท)</button>
-        <!-- <button type="button" class="btn btn-menu" id="menu3" onclick="selectMenu(3, 50, 'menu3')">ราดข้าว 3 อย่าง (50 บาท)</button> -->
-        <button type="button" class="btn btn-menu" id="menu4" onclick="selectMenu(4, 40, 'menu4')">กับข้าว (40 บาท)</button>
-        <button type="button" class="btn btn-menu" id="menu5" onclick="selectMenu(5, 30, 'menu5')">กับข้าว (30 บาท)</button>
-        <!-- <button type="button" class="btn btn-menu" id="menu6" onclick="selectMenu(6, 30, 'menu6')">อาหารจานเดียว (30 บาท)</button> -->
-        <!-- <button type="button" class="btn btn-menu" id="menu7" onclick="selectMenu(7, 40, 'menu7')">อาหารจานเดียว (40 บาท)</button> -->
-        <button type="button" class="btn btn-menu" id="menu8" onclick="selectMenu(8, 10, 'menu8')">ข้าวเปล่า (10 บาท)</button>
+        <!-- ปรับเปลี่ยน onClick เป็นระบบ addMenu เข้าตะกร้า -->
+        <button type="button" class="btn btn-menu" id="menu1" onclick="addMenu(30, 'menu1')">ราดข้าว 1 อย่าง (30 บาท)</button>
+        <button type="button" class="btn btn-menu" id="menu2" onclick="addMenu(40, 'menu2')">ราดข้าว 2 อย่าง (40 บาท)</button>
+        <button type="button" class="btn btn-menu" id="menu3" onclick="addMenu(50, 'menu3')">ราดข้าว 3 อย่าง (50 บาท)</button>
+        <button type="button" class="btn btn-menu" id="menu4" onclick="addMenu(40, 'menu4')">กับข้าว (40 บาท)</button>
+        <button type="button" class="btn btn-menu" id="menu5" onclick="addMenu(30, 'menu5')">กับข้าว (30 บาท)</button>
+        <!-- <button type="button" class="btn btn-menu" id="menu6" onclick="addMenu(30, 'menu6')">อาหารจานเดียว (30 บาท)</button> -->
+        <!-- <button type="button" class="btn btn-menu" id="menu7" onclick="addMenu(40, 'menu7')">อาหารจานเดียว (40 บาท)</button> -->
+        <button type="button" class="btn btn-menu" id="menu8" onclick="addMenu(10, 'menu8')">ข้าวเปล่า (10 บาท)</button>
         
-        <!-- <button type="button" class="btn btn-option" id="eggOpt1" onclick="toggleEgg(1, 5, 'egg1')">🥚 เพิ่มไข่ต้ม/ทอดมัน (+5 บาท)</button> -->
-        <button type="button" class="btn btn-option" id="eggOpt2" onclick="toggleEgg(2, 7, 'egg2')">🥚 เพิ่มไข่ดาว/หมูยอ (+7 บาท)</button>
-        <!-- <button type="button" class="btn btn-option" id="eggOpt3" onclick="toggleEgg(3, 15, 'egg3')">🥚 เพิ่มไข่เจียวทรงเครื่อง (+15 บาท)</button> -->
-        <!-- <button type="button" class="btn btn-option" id="eggOpt4" onclick="toggleEgg(4, 15, 'egg4')">🥚 เพิ่มไข่ลูกเขย (+15 บาท)</button> -->
-        <!-- <button type="button" class="btn btn-option" id="eggOpt5" onclick="toggleEgg(5, 20, 'egg5')">🥚 เพิ่มพะโล้ (+20 บาท)</button> -->
+        <!-- <button type="button" class="btn btn-option" id="eggOpt1" onclick="addMenu(5, 'egg1')">🥚 เพิ่มไข่ต้ม (+5 บาท)</button> -->
+        <!-- <button type="button" class="btn btn-option" id="eggOpt2" onclick="addMenu(7, 'egg2')">🥚 เพิ่มไข่ดาว (+7 บาท)</button> -->
+        <!-- <button type="button" class="btn btn-option" id="eggOpt3" onclick="addMenu(15, 'egg3')">🥚 เพิ่มไข่เจียวทรงเครื่อง (+15 บาท)</button> -->
+        <!-- <button type="button" class="btn btn-option" id="eggOpt4" onclick="addMenu(15, 'egg4')">🥚 เพิ่มไข่ลูกเขย (+15 บาท)</button> -->
+        <!-- <button type="button" class="btn btn-option" id="eggOpt5" onclick="addMenu(20, 'egg5')">🥚 เพิ่มพะโล้ (+20 บาท)</button> -->
 
         <div style="text-align: left; background: #f9f9f9; padding: 10px; border-radius: 8px; margin-top: 15px;">
             <label>📸 <b data-key="label_slip">แนบสลิปการโอนเงิน (ถ้ามี):</b></label>
@@ -295,6 +128,10 @@
         <button type="button" id="btnSave" class="btn btn-success" onclick="saveDirectToSheet()" data-key="btn_save">
             📌 บันทึกรายการจองนี้
         </button>
+        <!-- ปุ่มล้างรายการที่เพิ่มเข้ามา -->
+        <button type="button" class="btn btn-clear" onclick="clearForm()" data-key="btn_clear">
+            🗑️ ล้างรายการ
+        </button>
     </div>
 
     <div class="card">
@@ -305,13 +142,13 @@
     </div>
 
 <script>
-    let selectedMenus = {};
-    let selectedEggs = {};
+    let myOrders = []; // ✨ เปลี่ยนมาใช้ Array เพื่อรองรับการนับจำนวน
     let totalPrice = 0;
     let allBookings = [];
     let currentLang = 'th'; 
-    let isSubmitting = false; // ตัวแปรป้องกันการกดบันทึกซ้ำซ้อน
+    let isSubmitting = false;
 
+    // ✨ เพิ่มคำแปลสำหรับปุ่มล้างรายการ (btn_clear)
     const langData = {
         th: {
             shop_title: "🍛 ร้านข้าวราดแกงริมขอบฟ้า",
@@ -332,6 +169,7 @@
             currency: "บาท",
             btn_save: "📌 บันทึกรายการจองนี้",
             btn_saving: "⏳ กำลังส่งข้อมูล...",
+            btn_clear: "🗑️ ล้างรายการ",
             list_title: "📋 รายชื่อลูกค้าที่จองไว้ทั้งหมด",
             admin_warning: "🔄 รายชื่ออัปเดตอัตโนมัติจากระบบส่วนกลาง (Real-Time)",
             loading_text: "กำลังโหลดคิวจาก Google Sheets...",
@@ -377,6 +215,7 @@
             currency: "ဘတ်",
             btn_save: "📌 ဤမှာယူမှုကို သိမ်းဆည်းမည်",
             btn_saving: "⏳ အချက်အလက်များ ပို့နေသည်...",
+            btn_clear: "🗑️ စာရင်းဖျက်မည်",
             list_title: "📋 မှာယူထားသော ဝယ်သူများစာရင်း",
             admin_warning: "🔄 ဗဟိုစနစ်မှ အချက်အလက်များကို အလိုအလျောက် အပ်ဒိတ်လုပ်နေသည် (Real-Time)",
             loading_text: "Google Sheets မှ အချက်အလက်များကို ဆွဲယူနေသည်...",
@@ -422,6 +261,7 @@
             currency: "THB",
             btn_save: "📌 Save Booking",
             btn_saving: "⏳ Sending...",
+            btn_clear: "🗑️ Clear Items",
             list_title: "📋 Booking List",
             admin_warning: "🔄 Real-time update from central system",
             loading_text: "Loading queue from Google Sheets...",
@@ -489,49 +329,42 @@
         document.getElementById('eggOpt4').innerHTML = `🥚 ${langData[lang].egg4} (+15 ${langData[lang].currency})`;
         document.getElementById('eggOpt5').innerHTML = `🥚 ${langData[lang].egg5} (+20 ${langData[lang].currency})`;
 
-        updateTotal();
+        updateTotal(); // อัปเดตภาษาในบิลสรุปด้วย
         renderBookings(allBookings);
     }
 
-    function selectMenu(id, price, langKey) {
-        const btn = document.getElementById('menu' + id);
-        if (selectedMenus[id]) {
-            delete selectedMenus[id];
-            btn.classList.remove('active');
-        } else {
-            selectedMenus[id] = { langKey: langKey, price: price };
-            btn.classList.add('active');
-        }
+    // ✨ ฟังก์ชันเพิ่มเมนูเข้าตะกร้า (แทนที่การเปิดปิด Class Active เดิม)
+    function addMenu(price, langKey) {
+        myOrders.push({ langKey: langKey, price: price });
         updateTotal();
     }
 
-    function toggleEgg(id, price, langKey) {
-        const btn = document.getElementById('eggOpt' + id);
-        if (selectedEggs[id]) {
-            delete selectedEggs[id];
-            btn.classList.remove('active');
-        } else {
-            selectedEggs[id] = { langKey: langKey, price: price };
-            btn.classList.add('active');
-        }
-        updateTotal();
-    }
-
+    // ✨ ฟังก์ชันคำนวณราคาและนับจำนวน
     function updateTotal() {
+        let menuCounts = {};
+        totalPrice = 0;
+
+        // นับจำนวนเมนูที่ซ้ำกัน และรวมราคา
+        myOrders.forEach(item => {
+            if (!menuCounts[item.langKey]) {
+                menuCounts[item.langKey] = { count: 0, price: item.price };
+            }
+            menuCounts[item.langKey].count++;
+            totalPrice += item.price;
+        });
+
+        // สร้าง Text สรุปรายการ
         let menuNamesArray = [];
-        let menuSum = 0;
-
-        for (let id in selectedMenus) {
-            menuNamesArray.push(langData[currentLang][selectedMenus[id].langKey]);
-            menuSum += selectedMenus[id].price;
+        for (let key in menuCounts) {
+            let name = langData[currentLang][key];
+            let count = menuCounts[key].count;
+            if (count > 1) {
+                menuNamesArray.push(`${name} x${count}`);
+            } else {
+                menuNamesArray.push(name);
+            }
         }
 
-        for (let id in selectedEggs) {
-            menuNamesArray.push(langData[currentLang][selectedEggs[id].langKey]);
-            menuSum += selectedEggs[id].price;
-        }
-
-        totalPrice = menuSum;
         let finalName = menuNamesArray.length > 0 ? menuNamesArray.join(" + ") : langData[currentLang].res_menu_default;
         let cName = document.getElementById('custName').value.trim() || langData[currentLang].res_customer_default;
 
@@ -555,33 +388,25 @@
     }
 
     async function saveDirectToSheet() {
-        if (isSubmitting) return; // ถ้ากำลังส่งข้อมูลอยู่ จะไม่ทำซ้ำอีกรอบเด็ดขาด 🔒
+        if (isSubmitting) return;
 
         let name = document.getElementById('custName').value.trim();
-        let menuNamesArray = [];
-
-        for (let id in selectedMenus) {
-            menuNamesArray.push(langData[currentLang][selectedMenus[id].langKey]);
-        }
-        for (let id in selectedEggs) {
-            menuNamesArray.push(langData[currentLang][selectedEggs[id].langKey]);
-        }
         
-        let finalMenu = menuNamesArray.join(" + ");
-        if (finalMenu === "" && document.getElementById('resName').innerText !== langData[currentLang].res_menu_default) {
-            finalMenu = document.getElementById('resName').innerText;
+        // ✨ ดึง Text ที่ถูกสรุปยอดแล้วมาใช้งานได้เลย
+        let finalMenu = document.getElementById('resName').innerText;
+        if (finalMenu === langData[currentLang].res_menu_default) {
+            finalMenu = "";
         }
 
         if (!name) {
             alert(langData[currentLang].alert_name);
             return;
         }
-        if (totalPrice === 0) {
+        if (totalPrice === 0 && finalMenu === "") {
             alert(langData[currentLang].alert_menu);
             return;
         }
 
-        // เริ่มต้นล็อกปุ่มและตั้งสถานะการส่งข้อมูล เพื่อกัน Double Submit
         isSubmitting = true;
         let btn = document.getElementById('btnSave');
         btn.disabled = true;
@@ -624,7 +449,6 @@
             alert(langData[currentLang].alert_error);
         })
         .finally(() => {
-            // ปลดล็อกให้ปุ่มสามารถใช้งานใหม่ได้เฉพาะหลังจากทำทุกอย่างเสร็จสิ้นแล้วเท่านั้น
             btn.disabled = false;
             btn.innerText = langData[currentLang].btn_save;
             isSubmitting = false;
@@ -679,7 +503,7 @@
     }
 
     function prepareCashierUpdate(name, menuText, price) {
-        clearForm(); 
+        clearForm(); // ล้างข้อมูลก่อน
         
         document.getElementById('custName').value = name;
         totalPrice = parseInt(price) || 0;
@@ -689,7 +513,7 @@
         document.getElementById('resPrice').innerText = totalPrice;
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
-        alert("📥 ดึงข้อมูลของคิว [" + name + "] แล้วเรียบร้อย! ปุ่มเมนูทุกปุ่มยังใช้งานได้ปกติ โปรดแนบไฟล์สลิปและกดบันทึกได้เลยครับ");
+        alert("📥 ดึงข้อมูลของคิว [" + name + "] แล้วเรียบร้อย! โปรดแนบไฟล์สลิปและกดบันทึกได้เลยครับ");
     }
 
     function renderBookings(bookingsList) {
@@ -739,23 +563,13 @@
         renderBookings(filtered);
     }
 
+    // ✨ ฟังก์ชันสำหรับล้างรายการ
     function clearForm() {
         document.getElementById('custName').value = "";
         document.getElementById('slipFile').value = "";
-
-        selectedMenus = {};
-        selectedEggs = {};
+        myOrders = []; // เคลียร์ตะกร้า
         totalPrice = 0;
-
-        for (let i = 1; i <= 8; i++) {
-            let menuBtn = document.getElementById('menu' + i);
-            if (menuBtn) menuBtn.classList.remove('active');
-        }
-        for (let i = 1; i <= 5; i++) {
-            let eggBtn = document.getElementById('eggOpt' + i);
-            if (eggBtn) eggBtn.classList.remove('active');
-        }
-        updateTotal();
+        updateTotal(); // สั่งรีเฟรชยอดให้เป็น 0
     }
 
     /* =======================================================
