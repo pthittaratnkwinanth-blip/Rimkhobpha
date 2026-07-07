@@ -87,7 +87,7 @@
 
         <div style="text-align: left; background: #f9f9f9; padding: 10px; border-radius: 8px; margin-bottom: 15px;">
             <label>👤 <b data-key="label_cust_name">ชื่อลูกค้า หรือ รหัสการจอง:</b></label>
-            <input type="text" id="custName" placeholder="เช่น คนสวย/เมนูที่1/เมนูที่2/เมนูที่3">
+            <input type="text" id="custName" placeholder="เช่น ชื่อ/เลขลำดับเมนู1+2+3">
         </div>
 
         <!-- ปรับเปลี่ยน onClick เป็นระบบ addMenu เข้าตะกร้า -->
@@ -101,9 +101,9 @@
         <button type="button" class="btn btn-menu" id="menu8" onclick="addMenu(10, 'menu8')">ข้าวเปล่า (10 บาท)</button>
         
         <!-- <button type="button" class="btn btn-option" id="eggOpt1" onclick="addMenu(5, 'egg1')">🥚 เพิ่มไข่ต้ม (+5 บาท)</button> -->
-        <button type="button" class="btn btn-option" id="eggOpt2" onclick="addMenu(7, 'egg2')">🥚 เพิ่มไข่ดาว (+7 บาท)</button>
+        <!-- <button type="button" class="btn btn-option" id="eggOpt2" onclick="addMenu(7, 'egg2')">🥚 เพิ่มไข่ดาว (+7 บาท)</button> -->
         <!-- <button type="button" class="btn btn-option" id="eggOpt3" onclick="addMenu(15, 'egg3')">🥚 เพิ่มไข่เจียวทรงเครื่อง (+15 บาท)</button> -->
-        <!-- <button type="button" class="btn btn-option" id="eggOpt4" onclick="addMenu(15, 'egg4')">🥚 เพิ่มไข่ลูกเขย (+15 บาท)</button> -->
+        <button type="button" class="btn btn-option" id="eggOpt4" onclick="addMenu(15, 'egg4')">🥚 เพิ่มไข่ลูกเขย (+15 บาท)</button>
         <!-- <button type="button" class="btn btn-option" id="eggOpt5" onclick="addMenu(20, 'egg5')">🥚 เพิ่มพะโล้ (+20 บาท)</button> -->
 
         <div style="text-align: left; background: #f9f9f9; padding: 10px; border-radius: 8px; margin-top: 15px;">
@@ -297,41 +297,53 @@
     setInterval(fetchSheetData, 5000);
 
     function switchLanguage(lang) {
-        currentLang = lang;
-        document.documentElement.lang = lang;
-        
-        document.getElementById('lang-th').classList.toggle('active', lang === 'th');
-        document.getElementById('lang-my').classList.toggle('active', lang === 'my');
-        document.getElementById('lang-en').classList.toggle('active', lang === 'en');
-
-        document.querySelectorAll('[data-key]').forEach(el => {
-            const key = el.getAttribute('data-key');
-            if (langData[lang][key]) {
-                el.innerText = langData[lang][key];
-            }
-        });
-
-        document.getElementById('custName').placeholder = langData[lang].placeholder_cust_name;
-        document.getElementById('searchBox').placeholder = langData[lang].placeholder_search;
-
-        document.getElementById('menu1').innerHTML = `${langData[lang].menu1} (30 ${langData[lang].currency})`;
-        document.getElementById('menu2').innerHTML = `${langData[lang].menu2} (40 ${langData[lang].currency})`;
-        document.getElementById('menu3').innerHTML = `${langData[lang].menu3} (50 ${langData[lang].currency})`;
-        document.getElementById('menu4').innerHTML = `${langData[lang].menu4} (40 ${langData[lang].currency})`;
-        document.getElementById('menu5').innerHTML = `${langData[lang].menu5} (30 ${langData[lang].currency})`;
-        document.getElementById('menu6').innerHTML = `${langData[lang].menu6} (30 ${langData[lang].currency})`;
-        document.getElementById('menu7').innerHTML = `${langData[lang].menu7} (40 ${langData[lang].currency})`;
-        document.getElementById('menu8').innerHTML = `${langData[lang].menu8} (10 ${langData[lang].currency})`;
-
-        document.getElementById('eggOpt1').innerHTML = `🥚 ${langData[lang].egg1} (+5 ${langData[lang].currency})`;
-        document.getElementById('eggOpt2').innerHTML = `🥚 ${langData[lang].egg2} (+7 ${langData[lang].currency})`;
-        document.getElementById('eggOpt3').innerHTML = `🥚 ${langData[lang].egg3} (+15 ${langData[lang].currency})`;
-        document.getElementById('eggOpt4').innerHTML = `🥚 ${langData[lang].egg4} (+15 ${langData[lang].currency})`;
-        document.getElementById('eggOpt5').innerHTML = `🥚 ${langData[lang].egg5} (+20 ${langData[lang].currency})`;
-
-        updateTotal(); // อัปเดตภาษาในบิลสรุปด้วย
-        renderBookings(allBookings);
+    // --- 1. แทรกฟังก์ชันนี้ไว้ที่บรรทัดบนสุดของ switchLanguage ---
+    function updateBtn(id, text) {
+        let el = document.getElementById(id);
+        if (el) { // ถ้าหาปุ่มเจอ ถึงจะสั่งเปลี่ยนข้อความ
+            el.innerHTML = text;
+        }
     }
+    // --------------------------------------------------------
+
+    currentLang = lang;
+    document.documentElement.lang = lang;
+    
+    // ... โค้ดเดิมของพี่ (ส่วนการ Toggle Class) ...
+    document.getElementById('lang-th').classList.toggle('active', lang === 'th');
+    document.getElementById('lang-my').classList.toggle('active', lang === 'my');
+    document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+
+    // ... โค้ดเดิมของพี่ (ส่วนการเปลี่ยน text ตาม data-key) ...
+    document.querySelectorAll('[data-key]').forEach(el => {
+        const key = el.getAttribute('data-key');
+        if (langData[lang][key]) {
+            el.innerText = langData[lang][key];
+        }
+    });
+
+    document.getElementById('custName').placeholder = langData[lang].placeholder_cust_name;
+    document.getElementById('searchBox').placeholder = langData[lang].placeholder_search;
+
+    // --- 2. จากนั้นลบของเดิม แล้วเรียกใช้ updateBtn แทนตรงนี้ครับ ---
+    updateBtn('menu1', `${langData[lang].menu1} (30 ${langData[lang].currency})`);
+    updateBtn('menu2', `${langData[lang].menu2} (40 ${langData[lang].currency})`);
+    updateBtn('menu3', `${langData[lang].menu3} (50 ${langData[lang].currency})`);
+    updateBtn('menu4', `${langData[lang].menu4} (40 ${langData[lang].currency})`);
+    updateBtn('menu5', `${langData[lang].menu5} (30 ${langData[lang].currency})`);
+    updateBtn('menu6', `${langData[lang].menu6} (30 ${langData[lang].currency})`);
+    updateBtn('menu7', `${langData[lang].menu7} (40 ${langData[lang].currency})`);
+    updateBtn('menu8', `${langData[lang].menu8} (10 ${langData[lang].currency})`);
+
+    updateBtn('eggOpt1', `🥚 ${langData[lang].egg1} (+5 ${langData[lang].currency})`);
+    updateBtn('eggOpt2', `🥚 ${langData[lang].egg2} (+7 ${langData[lang].currency})`);
+    updateBtn('eggOpt3', `🥚 ${langData[lang].egg3} (+15 ${langData[lang].currency})`);
+    updateBtn('eggOpt4', `🥚 ${langData[lang].egg4} (+15 ${langData[lang].currency})`);
+    updateBtn('eggOpt5', `🥚 ${langData[lang].egg5} (+20 ${langData[lang].currency})`);
+
+    updateTotal();
+    renderBookings(allBookings);
+}
 
     // ✨ ฟังก์ชันเพิ่มเมนูเข้าตะกร้า (แทนที่การเปิดปิด Class Active เดิม)
     function addMenu(price, langKey) {
