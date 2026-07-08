@@ -87,7 +87,7 @@
 
         <div style="text-align: left; background: #f9f9f9; padding: 10px; border-radius: 8px; margin-bottom: 15px;">
             <label>👤 <b data-key="label_cust_name">ชื่อลูกค้า หรือ รหัสการจอง:</b></label>
-            <input type="text" id="custName" placeholder="เช่น ชื่อ/เลขลำดับเมนู1+2+3">
+            <input type="text" id="custName" placeholder="เช่น ชื่อ/เลขลำดับเมนู1+2">
         </div>
 
         <!-- ปรับเปลี่ยน onClick เป็นระบบ addMenu เข้าตะกร้า -->
@@ -100,8 +100,8 @@
         <!-- <button type="button" class="btn btn-menu" id="menu7" onclick="addMenu(40, 'menu7')">อาหารจานเดียว (40 บาท)</button> -->
         <button type="button" class="btn btn-menu" id="menu8" onclick="addMenu(10, 'menu8')">ข้าวเปล่า (10 บาท)</button>
         
-        <button type="button" class="btn btn-option" id="eggOpt1" onclick="addMenu(5, 'egg1')">🥚 เพิ่มไข่ต้ม/ทอดมัน (+5 บาท)</button>
-        <!-- <button type="button" class="btn btn-option" id="eggOpt2" onclick="addMenu(7, 'egg2')">🥚 เพิ่มไข่ดาว/ (+7 บาท)</button> -->
+        <!-- <button type="button" class="btn btn-option" id="eggOpt1" onclick="addMenu(5, 'egg1')">🥚 เพิ่มไข่ต้ม/ทอดมัน (+5 บาท)</button> -->
+        <button type="button" class="btn btn-option" id="eggOpt2" onclick="addMenu(7, 'egg2')">🥚 เพิ่มไข่ดาว/หมูยอ (+7 บาท)</button>
         <!-- <button type="button" class="btn btn-option" id="eggOpt3" onclick="addMenu(15, 'egg3')">🥚 เพิ่มไข่เจียวทรงเครื่อง (+15 บาท)</button> -->
         <!-- <button type="button" class="btn btn-option" id="eggOpt4" onclick="addMenu(15, 'egg4')">🥚 เพิ่มไข่ลูกเขย (+15 บาท)</button> -->
         <!-- <button type="button" class="btn btn-option" id="eggOpt5" onclick="addMenu(20, 'egg5')">🥚 เพิ่มพะโล้ (+20 บาท)</button> -->
@@ -158,7 +158,7 @@
             bank_account_no: "เลขที่บัญชี:",
             bank_account_name: "ชื่อบัญชี:",
             label_cust_name: "ชื่อลูกค้า หรือ รหัสการจอง:",
-            placeholder_cust_name: "เช่น คนสวย / โต๊ะ 5 / บอส01",
+            placeholder_cust_name: "เช่น ชื่อ/ลำดับเมนู",
             placeholder_search: "🔍 พิมพ์ค้นหา ชื่อ หรือ รหัสจอง...",
             label_slip: "แนบสลิปการโอนเงิน (ถ้ามี):",
             res_customer_label: "ลูกค้า:",
@@ -204,7 +204,7 @@
             bank_account_no: "အကောင့်နံပါတ်:",
             bank_account_name: "အကောင့်အမည်:",
             label_cust_name: "ဝယ်သူအမည် သို့မဟုတ် မှာယူမှုကုဒ်:",
-            placeholder_cust_name: "ဥပမာ- အလှလေး / စားပွဲ ၅ / Boss01",
+            placeholder_cust_name: "အမည်/မီနူး မှာယူမှု/အပေါ်ယံလွှာ",
             placeholder_search: "🔍 အမည် သို့မဟုတ် ကုဒ်ဖြင့် ရှာဖွေရန်...",
             label_slip: "ငွေလွှဲပြေစာ ပူးတွဲပါ (ရှိလျှင်):",
             res_customer_label: "ဝယ်သူ:",
@@ -237,7 +237,7 @@
             menu7: "တစ်ပွဲစာ အစားအစာ (၄၀ ဘတ်)",
             menu8: "ထမင်းဖြူ",
             egg1: "ကြက်ဥပြုတ် ထပ်တိုး/ငါးအသားပြားကြော်",
-            egg2: "ကြက်ဥကြော် ထပ်တိုး",
+            egg2: "ကြက်ဥကြော် ထပ်တိုး/ဗီယက်နမ်စတိုင် ဝက်အူချောင်",
             egg3: "ကြက်ဥမုန့်ကြော် ထပ်တိုး",
             egg4: "ခဲယိုကြက်ဥ ထပ်တိုး",
             egg5: "ပဥလိုဟင်း ထပ်တိုး"
@@ -250,7 +250,7 @@
             bank_account_no: "Account Number:",
             bank_account_name: "Account Name:",
             label_cust_name: "Customer Name or Booking ID:",
-            placeholder_cust_name: "e.g., John / Table 5 / Boss01",
+            placeholder_cust_name: "e.g., Name /NO.Order/Topping",
             placeholder_search: "🔍 Search by name or ID...",
             label_slip: "Attach Payment Slip (if any):",
             res_customer_label: "Customer:",
@@ -283,7 +283,7 @@
             menu7: "Single Dish (40 THB)",
             menu8: "Plain Rice",
             egg1: "Add Boiled Egg/Thai fish cakes",
-            egg2: "Add Fried Egg",
+            egg2: "Add Fried Egg/ground pork",
             egg3: "Add Omelet",
             egg4: "Add Scotch Egg",
             egg5: "Add Stewed Pork"
