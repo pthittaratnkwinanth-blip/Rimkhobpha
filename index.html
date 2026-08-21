@@ -10,7 +10,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Myanmar:wght@400;700&family=Noto+Sans+Thai:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
-        /* 🔒 1. โค้ดสำหรับล็อกไม่ให้ผู้ใช้งานลากเมาส์คลุมดำไฮไลต์ข้อความบนหน้าเว็บ */
         body {
             font-family: 'Noto Sans Thai', 'Noto Sans Myanmar', 'Arial', sans-serif;
             background-color: #f4f4f9;
@@ -35,7 +34,6 @@
         h2 { color: #d9534f; margin-bottom: 10px; margin-top: 5px; }
         h3 { color: #333; margin-top: 10px; text-align: left; }
         
-        /* ปรับแต่งปุ่มให้เวลากดแล้วดูสมูทขึ้น */
         .btn { width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; transition: transform 0.1s, background-color 0.2s; font-weight: bold; }
         .btn:active { transform: scale(0.98); }
         .btn-menu { background-color: #f0f0f0; color: #333; border: 1px solid #ccc; }
@@ -90,21 +88,13 @@
             <input type="text" id="custName" placeholder="เช่น ชื่อ/เลขลำดับเมนู 1+2+3">
         </div>
 
-        <!-- ปรับเปลี่ยน onClick เป็นระบบ addMenu เข้าตะกร้า -->
+        <!-- ปุ่มรายการเมนูที่ใช้งานจริง -->
         <button type="button" class="btn btn-menu" id="menu1" onclick="addMenu(30, 'menu1')">ราดข้าว 1 อย่าง (30 บาท)</button>
         <button type="button" class="btn btn-menu" id="menu2" onclick="addMenu(40, 'menu2')">ราดข้าว 2 อย่าง (40 บาท)</button>
-        <!-- <button type="button" class="btn btn-menu" id="menu3" onclick="addMenu(50, 'menu3')">ชุดน้ำพริก ผัก ปลาทู (50 บาท)</button> -->
         <button type="button" class="btn btn-menu" id="menu4" onclick="addMenu(40, 'menu4')">กับข้าว (40 บาท)</button>
         <button type="button" class="btn btn-menu" id="menu5" onclick="addMenu(30, 'menu5')">กับข้าว (30 บาท)</button>
-        <!-- <button type="button" class="btn btn-menu" id="menu6" onclick="addMenu(20, 'menu6')">ปลาทู (20 บาท)</button> -->
         <button type="button" class="btn btn-menu" id="menu7" onclick="addMenu(40, 'menu7')">ข้าวหมูแดง (40 บาท)</button>
         <button type="button" class="btn btn-menu" id="menu8" onclick="addMenu(10, 'menu8')">ข้าวเปล่า (10 บาท)</button>
-        
-        <!-- <button type="button" class="btn btn-option" id="eggOpt1" onclick="addMenu(5, 'egg1')">🥚 ทอดมัน (+5 บาท)</button> -->
-        <!--<button type="button" class="btn btn-option" id="eggOpt2" onclick="addMenu(7, 'egg2')">🥚 ไข่ดาว (+7 บาท)</button> -->
-        <!-- <button type="button" class="btn btn-option" id="eggOpt3" onclick="addMenu(10, 'egg3')">🥚 เพิ่มเห็ดเข็มทองทอด (+10 บาท)</button> -->
-        <!-- <button type="button" class="btn btn-option" id="eggOpt4" onclick="addMenu(15, 'egg4')">🥚 เพิ่มไข่เจียวทรงเครื่อง(+15 บาท)</button> -->
-        <!-- <button type="button" class="btn btn-option" id="eggOpt5" onclick="addMenu(20, 'egg5')">🥚 ไข่พะโล้ (+20 บาท)</button> -->
 
         <div style="text-align: left; background: #f9f9f9; padding: 10px; border-radius: 8px; margin-top: 15px;">
             <label>📸 <b data-key="label_slip">แนบสลิปการโอนเงิน (ถ้ามี):</b></label>
@@ -128,7 +118,6 @@
         <button type="button" id="btnSave" class="btn btn-success" onclick="saveDirectToSheet()" data-key="btn_save">
             📌 บันทึกรายการจองนี้
         </button>
-        <!-- ปุ่มล้างรายการที่เพิ่มเข้ามา -->
         <button type="button" class="btn btn-clear" onclick="clearForm()" data-key="btn_clear">
             🗑️ ล้างรายการ
         </button>
@@ -142,13 +131,13 @@
     </div>
 
 <script>
-    let myOrders = []; // ✨ เปลี่ยนมาใช้ Array เพื่อรองรับการนับจำนวน
+    let myOrders = []; 
     let totalPrice = 0;
     let allBookings = [];
     let currentLang = 'th'; 
     let isSubmitting = false;
 
-    // ✨ เพิ่มคำแปลสำหรับปุ่มล้างรายการ (btn_clear)
+    // แก้ไขคำแปลภาษาให้ครบทุกเมนูที่มีบนหน้าจอ
     const langData = {
         th: {
             shop_title: "🍛 ร้านข้าวราดแกงริมขอบฟ้า",
@@ -184,17 +173,10 @@
             alert_context: "🔒 ไม่อนุญาตให้คลิกขวาบนหน้าเว็บนี้เพื่อความปลอดภัยของระบบครับ",
             menu1: "ราดข้าว 1 อย่าง",
             menu2: "ราดข้าว 2 อย่าง",
-            menu3: "ราดข้าว 3 อย่าง",
             menu4: "กับข้าว (40 บ.)",
             menu5: "กับข้าว (30 บ.)",
-            menu6: "ปลาทู (20 บ.)",
             menu7: "ข้าวหมูแดง (40 บ.)",
-            menu8: "ข้าวเปล่า",
-            egg1: "เพิ่มทอดมัน",
-            egg2: "เพิ่มไข่ดาว",
-            egg3: "เพิ่มเห็ดเข็มทอง",
-            egg4: "เพิ่มไข่เจียวทรงเครื่อง",
-            egg5: "เพิ่มไข่พะโล้"
+            menu8: "ข้าวเปล่า (10 บ.)"
         },
         my: {
             shop_title: "🍛 မိုးကုတ်စက်ဝိုင်း ထမင်းဆိုင်",
@@ -208,8 +190,7 @@
             placeholder_search: "🔍 အမည် သို့မဟုတ် ကုဒ်ဖြင့် ရှာဖွေရန်...",
             label_slip: "ငွေလွှဲပြေစာ ပူးတွဲပါ (ရှိလျှင်):",
             res_customer_label: "ဝယ်သူ:",
-            res_customer_default: "-
-Iင်တွင် တိုက်ရိုက် (မမှာယူထားပါ)",
+            res_customer_default: "ဆိုင်တွင် တိုက်ရိုက် (မမှာယူထားပါ)",
             res_menu_label: "မီနူးစာရင်း:",
             res_menu_default: "မီနူးမရွေးရသေးပါ",
             res_total_label: "စုစုပေါင်း:",
@@ -231,17 +212,10 @@ Iင်တွင် တိုက်ရိုက် (မမှာယူထား�
             alert_context: "🔒 စနစ်လုံခြုံရေးအရ ဤဝဘ်ဆိုဒ်ပေါ်တွင် Right-Click နှိပ်ခွင့်မပြုပါ",
             menu1: "ထမင်းနှင့်ဟင်း ၁ မျိုး",
             menu2: "ထမင်းနှင့်ဟင်း ၂ မျိုး",
-            menu3: "ထမင်းနှင့်ဟင်း ၃ မျိုး",
             menu4: "ဟင်းပွဲ (၄၀ ဘတ်)",
             menu5: "ဟင်းပွဲ (၃၀ ဘတ်)",
-            menu6: "ခေါက်ဆွဲကြော်  (၃၀ ဘတ်)",
-            menu7: "ဝက်သားနီထမင် ၄၀ ဘတ်",   
-            menu8: "ထမင်းဖြူ",
-            egg1: "ကြက်ဥပြုတ် ထပ်တိုး/ငါးအသားပြားကြော်",
-            egg2: "ကြက်ဥကြော်",
-            egg3: "မှိုကြော်",
-            egg4: "ကြက်ဥကြော် မန်ကျည်းနှစ်ဆော့ဖြင့်",
-            egg5: "ကြက်ဥကြော်အချို (၂၀ ဘတ်)"
+            menu7: "ဝက်သားနီထမင်း (၄၀ ဘတ်)",   
+            menu8: "ထမင်းဖြူ (၁၀ ဘတ်)"
         },
         en: {
             shop_title: "🍛 Rimkhobpha Curry Rice",
@@ -277,17 +251,10 @@ Iင်တွင် တိုက်ရိုက် (မမှာယူထား�
             alert_context: "🔒 Right-click is disabled for security.",
             menu1: "Rice + 1 Curry",
             menu2: "Rice + 2 Curries",
-            menu3: "Rice + 3 Curries",
             menu4: "Side Dish (40 THB)",
             menu5: "Side Dish (30 THB)",
-            menu6: "Stir-Fried Rice Noodles (30 THB)",
             menu7: "Red barbecued pork with rice (40 THB)",
-            menu8: "Plain Rice",
-            egg1: "Add Boiled Egg/Thai fish cakes",
-            egg2: "Add fried egg",
-            egg3: "Add Crispy Fried Enoki Mushrooms",
-            egg4: "Add Son-in-law eggs",
-            egg5: "Five-Spice Eggs 20 bath"
+            menu8: "Plain Rice (10 THB)"
         }
     };
 
@@ -297,67 +264,51 @@ Iင်တွင် တိုက်ရိုက် (မမှာယူထား�
     fetchSheetData();
     setInterval(fetchSheetData, 5000);
 
-    function switchLanguage(lang) {
-    // --- 1. แทรกฟังก์ชันนี้ไว้ที่บรรทัดบนสุดของ switchLanguage ---
     function updateBtn(id, text) {
         let el = document.getElementById(id);
-        if (el) { // ถ้าหาปุ่มเจอ ถึงจะสั่งเปลี่ยนข้อความ
+        if (el) { 
             el.innerHTML = text;
         }
     }
-    // --------------------------------------------------------
 
-    currentLang = lang;
-    document.documentElement.lang = lang;
-    
-    // ... โค้ดเดิมของพี่ (ส่วนการ Toggle Class) ...
-    document.getElementById('lang-th').classList.toggle('active', lang === 'th');
-    document.getElementById('lang-my').classList.toggle('active', lang === 'my');
-    document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+    function switchLanguage(lang) {
+        currentLang = lang;
+        document.documentElement.lang = lang;
+        
+        document.getElementById('lang-th').classList.toggle('active', lang === 'th');
+        document.getElementById('lang-my').classList.toggle('active', lang === 'my');
+        document.getElementById('lang-en').classList.toggle('active', lang === 'en');
 
-    // ... โค้ดเดิมของพี่ (ส่วนการเปลี่ยน text ตาม data-key) ...
-    document.querySelectorAll('[data-key]').forEach(el => {
-        const key = el.getAttribute('data-key');
-        if (langData[lang][key]) {
-            el.innerText = langData[lang][key];
-        }
-    });
+        document.querySelectorAll('[data-key]').forEach(el => {
+            const key = el.getAttribute('data-key');
+            if (langData[lang][key]) {
+                el.innerText = langData[lang][key];
+            }
+        });
 
-    document.getElementById('custName').placeholder = langData[lang].placeholder_cust_name;
-    document.getElementById('searchBox').placeholder = langData[lang].placeholder_search;
+        document.getElementById('custName').placeholder = langData[lang].placeholder_cust_name;
+        document.getElementById('searchBox').placeholder = langData[lang].placeholder_search;
 
-    // --- 2. จากนั้นลบของเดิม แล้วเรียกใช้ updateBtn แทนตรงนี้ครับ ---
-    updateBtn('menu1', `${langData[lang].menu1} (30 ${langData[lang].currency})`);
-    updateBtn('menu2', `${langData[lang].menu2} (40 ${langData[lang].currency})`);
-    updateBtn('menu3', `${langData[lang].menu3} (50 ${langData[lang].currency})`);
-    updateBtn('menu4', `${langData[lang].menu4} (40 ${langData[lang].currency})`);
-    updateBtn('menu5', `${langData[lang].menu5} (30 ${langData[lang].currency})`);
-    updateBtn('menu6', `${langData[lang].menu6} (30 ${langData[lang].currency})`);
-    updateBtn('menu7', `${langData[lang].menu7} (40 ${langData[lang].currency})`);
-    updateBtn('menu8', `${langData[lang].menu8} (10 ${langData[lang].currency})`);
+        updateBtn('menu1', `${langData[lang].menu1} (30 ${langData[lang].currency})`);
+        updateBtn('menu2', `${langData[lang].menu2} (40 ${langData[lang].currency})`);
+        updateBtn('menu4', `${langData[lang].menu4}`);
+        updateBtn('menu5', `${langData[lang].menu5}`);
+        updateBtn('menu7', `${langData[lang].menu7}`);
+        updateBtn('menu8', `${langData[lang].menu8}`);
 
-    updateBtn('eggOpt1', `🥚 ${langData[lang].egg1} (+5 ${langData[lang].currency})`);
-    updateBtn('eggOpt2', `🥚 ${langData[lang].egg2} (+7 ${langData[lang].currency})`);
-    updateBtn('eggOpt3', `🥚 ${langData[lang].egg3} (+10 ${langData[lang].currency})`);
-    updateBtn('eggOpt4', `🥚 ${langData[lang].egg4} (+15 ${langData[lang].currency})`);
-    updateBtn('eggOpt5', `🥚 ${langData[lang].egg5} (+20 ${langData[lang].currency})`);
+        updateTotal();
+        renderBookings(allBookings);
+    }
 
-    updateTotal();
-    renderBookings(allBookings);
-}
-
-    // ✨ ฟังก์ชันเพิ่มเมนูเข้าตะกร้า (แทนที่การเปิดปิด Class Active เดิม)
     function addMenu(price, langKey) {
         myOrders.push({ langKey: langKey, price: price });
         updateTotal();
     }
 
-    // ✨ ฟังก์ชันคำนวณราคาและนับจำนวน
     function updateTotal() {
         let menuCounts = {};
         totalPrice = 0;
 
-        // นับจำนวนเมนูที่ซ้ำกัน และรวมราคา
         myOrders.forEach(item => {
             if (!menuCounts[item.langKey]) {
                 menuCounts[item.langKey] = { count: 0, price: item.price };
@@ -366,10 +317,9 @@ Iင်တွင် တိုက်ရိုက် (မမှာယူထား�
             totalPrice += item.price;
         });
 
-        // สร้าง Text สรุปรายการ
         let menuNamesArray = [];
         for (let key in menuCounts) {
-            let name = langData[currentLang][key];
+            let name = langData[currentLang][key] || key;
             let count = menuCounts[key].count;
             if (count > 1) {
                 menuNamesArray.push(`${name} x${count}`);
@@ -404,9 +354,8 @@ Iင်တွင် တိုက်ရိုက် (မမှာယူထား�
         if (isSubmitting) return;
 
         let name = document.getElementById('custName').value.trim();
-        
-        // ✨ ดึง Text ที่ถูกสรุปยอดแล้วมาใช้งานได้เลย
         let finalMenu = document.getElementById('resName').innerText;
+
         if (finalMenu === langData[currentLang].res_menu_default) {
             finalMenu = "";
         }
@@ -516,7 +465,7 @@ Iင်တွင် တိုက်ရိုက် (မမှာယူထား�
     }
 
     function prepareCashierUpdate(name, menuText, price) {
-        clearForm(); // ล้างข้อมูลก่อน
+        clearForm();
         
         document.getElementById('custName').value = name;
         totalPrice = parseInt(price) || 0;
@@ -576,18 +525,14 @@ Iင်တွင် တိုက်ရိုက် (မမှာယူထား�
         renderBookings(filtered);
     }
 
-    // ✨ ฟังก์ชันสำหรับล้างรายการ
     function clearForm() {
         document.getElementById('custName').value = "";
         document.getElementById('slipFile').value = "";
-        myOrders = []; // เคลียร์ตะกร้า
+        myOrders = []; 
         totalPrice = 0;
-        updateTotal(); // สั่งรีเฟรชยอดให้เป็น 0
+        updateTotal(); 
     }
 
-    /* =======================================================
-        🔒 2. โค้ด JavaScript สำหรับบล็อกการคลิกขวาและบล็อกคีย์ลัด 
-       ======================================================= */
     document.addEventListener('contextmenu', function(e) {
         e.preventDefault();
         alert(langData[currentLang].alert_context);
@@ -616,9 +561,6 @@ Iင်တွင် တိုက်ရိုက် (မမှာယူထား�
         }
     });
 
-    /* =======================================================
-        📢 3. โค้ดสำหรับดึงข้อมูลการแจ้งเตือนจากชีท Announce (config)
-       ======================================================= */
     async function fetchAnnouncement() {
         const fileId = "1US69UZxdU7NTyP2y0nYmebshzbUIYfiO6V7NlJRI4EI"; 
         const configUrl = `https://docs.google.com/spreadsheets/d/${fileId}/gviz/tq?sheet=config`;
